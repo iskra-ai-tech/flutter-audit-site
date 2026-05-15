@@ -146,7 +146,7 @@
       "@id": "{{site.origin}}/#faq",
       "mainEntity": [
         { "@type": "Question", "name": "Why an audit instead of just hiring a senior Flutter engineer?", "acceptedAnswer": { "@type": "Answer", "text": "Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question." } },
-        { "@type": "Question", "name": "We cannot share the repo. Is there another way?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. About a third of the audits I do are on screen-share only. Your engineer drives, I look, we record. Same deliverables, same price." } },
+        { "@type": "Question", "name": "Do you need the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The audit is me reading your code. Walkthroughs, screen-shares, or descriptions are not a substitute. NDA before code changes hands, but the source itself is non-negotiable." } },
         { "@type": "Question", "name": "Our app is not slow, it is just messy. Is the audit still useful?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, possibly more so. Performance audits get the headlines, architectural audits change quarters." } },
         { "@type": "Question", "name": "How is this different from running flutter analyze or a code-quality SaaS?", "acceptedAnswer": { "@type": "Answer", "text": "flutter analyze tells you what is syntactically wrong. The audit tells you what is strategically wrong. A linter sees code. The audit sees decisions." } },
         { "@type": "Question", "name": "What if you find the problem is too big for a 5-day audit?", "acceptedAnswer": { "@type": "Answer", "text": "I tell you on Day 2, refund the unused portion, and write up what I have found so far in whatever shape is useful to you." } },
@@ -158,6 +158,8 @@
 </script>
 </head>
 <body>
+
+<div class="scroll-progress" aria-hidden="true"></div>
 
 <a href="#top" class="visually-hidden">Skip to content</a>
 
@@ -174,15 +176,17 @@
   <a class="nav-cta" href="#book">Book the audit</a>
 </header>
 
+<div class="hero-hairline" aria-hidden="true"></div>
+
 <main>
 
 <!-- ═══════════════════════════════════════════════════════════
-     1. HERO  —  4-layer entrance, composite-only
+     1. HERO  —  multi-phase entrance, composite-only
      ═══════════════════════════════════════════════════════════ -->
 <section class="section hero" id="top">
   <div class="hero-grid" aria-hidden="true"></div>
   <div class="page hero-page">
-    <div class="hero-eyebrow"><span aria-hidden="true">2026</span> · Senior Flutter engineer · One audit at a time</div>
+    <div class="hero-eyebrow"><span class="hero-eyebrow-text">2026 · Senior Flutter engineer · One audit at a time</span></div>
 
     <p class="hero-byline">
       <picture>
@@ -194,9 +198,9 @@
     </p>
 
     <h1 class="hero-headline" id="hero-headline">
-      <span class="line">Your Flutter app is fixable.</span>
-      <span class="line">In a week.</span>
-      <span class="line">Without a rewrite.<span class="hero-caret" aria-hidden="true"></span></span>
+      <span class="line"><span class="line-inner">Your Flutter app is fixable.</span></span>
+      <span class="line"><span class="line-inner">In a week.</span></span>
+      <span class="line"><span class="line-inner">Without a rewrite.<span class="hero-caret" aria-hidden="true"></span></span></span>
     </h1>
 
     <hr class="hero-rule">
@@ -226,7 +230,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">01</span>&nbsp;Symptoms</p>
-      <h2 id="problem-h">Three sentences you have already said this quarter.</h2>
+      <h2 id="problem-h"><span class="lw">Three sentences you have already said this quarter.</span></h2>
     </header>
 
     <div class="problem-grid js-stagger">
@@ -256,7 +260,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">02</span>&nbsp;Deliverables</p>
-      <h2 id="deliv-h">A short list, a real report, and an hour with your team.</h2>
+      <h2 id="deliv-h"><span class="lw">A short list, a real report, and an hour with your team.</span></h2>
       <p class="lede muted">The audit is one product. Not a retainer, not a sales call. You get five things and you keep them.</p>
     </header>
 
@@ -308,7 +312,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">02b</span>&nbsp;Free · Read on the page</p>
-      <h2 id="cl-h">The 12-point Flutter performance checklist.</h2>
+      <h2 id="cl-h"><span class="lw">The 12-point Flutter performance checklist.</span></h2>
       <p class="lede muted">The exact warm-pass I run against every codebase on Day 1, before I touch DevTools. Public on purpose. If your team can clear all twelve, you probably do not need me.</p>
     </header>
 
@@ -338,7 +342,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">03</span>&nbsp;How I read code</p>
-      <h2 id="phil-h">A code audit is not a code review.</h2>
+      <h2 id="phil-h"><span class="lw">A code audit is not a code review.</span></h2>
     </header>
 
     <div class="philosophy js-reveal">
@@ -355,10 +359,11 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">04</span>&nbsp;How it runs</p>
-      <h2 id="proc-h">Five days. Same shape every time.</h2>
+      <h2 id="proc-h"><span class="lw">Five days. Same shape every time.</span></h2>
     </header>
 
     <div class="process">
+      <div class="process-rail" aria-hidden="true"></div>
       <div class="process-step js-reveal">
         <div class="process-day">DAY 0</div>
         <div>
@@ -398,12 +403,15 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">05</span>&nbsp;Price</p>
-      <h2 id="price-h">One price. Quoted after I see the repo.</h2>
+      <h2 id="price-h"><span class="lw">One price. Quoted after I see the repo.</span></h2>
     </header>
 
     <div class="pricing js-reveal">
       <div class="pricing-anchor">
-        <span class="pricing-amount"><span class="num">$4,800</span><span class="pricing-amount-unit">USD · from</span></span>
+        <span class="pricing-amount">
+          <span class="num pricing-count" data-pricing-count="4800" aria-label="$4,800">$<span class="pricing-count-digits">4,800</span></span>
+          <span class="pricing-amount-unit">USD · from</span>
+        </span>
       </div>
       <p class="pricing-note">Typical 5-day audit; the quote firms after the intake call.</p>
 
@@ -428,7 +436,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">06</span>&nbsp;Questions</p>
-      <h2 id="faq-h">Six questions, six answers.</h2>
+      <h2 id="faq-h"><span class="lw">Six questions, six answers.</span></h2>
     </header>
 
     <div class="faq">
@@ -437,8 +445,8 @@
         <div><p>Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question. The audit is the cheapest way to find out what hiring will not fix.</p></div>
       </details>
       <details class="faq-item js-reveal">
-        <summary>We cannot share the repo. Is there another way?</summary>
-        <div><p>Yes. About a third of the audits I do are on screen-share only. Your engineer drives, I look, we record. The deliverables are the same. The price is the same. The only thing different is who has the keyboard.</p></div>
+        <summary>Do you need the source code?</summary>
+        <div><p>Yes. The audit is me reading your code. Walkthroughs, screen-shares, recordings, or descriptions are not a substitute — I need the repo. NDA before code changes hands, no problem. If the source cannot be shared, the audit is not a fit.</p></div>
       </details>
       <details class="faq-item js-reveal">
         <summary>Our app is not slow. It is just messy. Is the audit still useful?</summary>
@@ -467,7 +475,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">07</span>&nbsp;The engineer</p>
-      <h2 id="about-h">The person opening your repo.</h2>
+      <h2 id="about-h"><span class="lw">The person opening your repo.</span></h2>
     </header>
 
     <div class="about js-reveal">
@@ -498,7 +506,7 @@
   <div class="page">
     <header class="section-head">
       <p class="eyebrow"><span class="num">08</span>&nbsp;Book</p>
-      <h2 id="book-h">Send me your repo.</h2>
+      <h2 id="book-h"><span class="lw">Send me your repo.</span></h2>
       <p class="lede muted">Or describe the one thing hurting most. I read every form myself, usually within 24 hours.</p>
     </header>
 

@@ -539,3 +539,205 @@
   letter-spacing: 0.04em;
   color: var(--ink-muted);
 }
+
+/* ============================================================
+   MICRO-INTERACTION LAYER
+   Composite-only; idle CPU ≈ 0 outside the CTA tease (10% duty)
+   ============================================================ */
+
+/* 1 — CTA periodic tease; pauses on hover/focus */
+.cta::after { animation: ctaTease 7s var(--ease-emphasized) 2.4s infinite; }
+.cta:hover::after,
+.cta:focus-visible::after { animation-play-state: paused; }
+@keyframes ctaTease {
+  0%, 86%, 100% { transform: scaleX(0.18); }
+  90%           { transform: scaleX(0.30); }
+  94%           { transform: scaleX(0.22); }
+}
+
+/* 2 — Cursor-follow brass glow on cards. JS writes --mx / --my */
+.bento-card, .problem-card { isolation: isolate; }
+.bento-card::after,
+.problem-card::after,
+.checklist > li::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--d-fg) var(--ease-out-quart);
+  z-index: 0;
+}
+.bento-card::after,
+.problem-card::after {
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%),
+              oklch(0.74 0.09 85 / 0.06), transparent 65%);
+}
+.checklist > li::after {
+  background: radial-gradient(160px circle at var(--mx, 50%) var(--my, 50%),
+              oklch(0.74 0.09 85 / 0.05), transparent 65%);
+}
+.bento-card:hover::after,
+.problem-card:hover::after,
+.checklist > li:hover::after { opacity: 1; }
+.bento-card > *, .problem-card > * { position: relative; z-index: 1; }
+
+/* 11 — Bento inner-content parallax on hover */
+.bento-card h3, .bento-card .bento-num {
+  transition: transform var(--d-quick) var(--ease-out-quart);
+}
+.bento-card:hover h3        { transform: translateY(-1.5px); }
+.bento-card:hover .bento-num { transform: translateY(1px); }
+
+/* 3 — FAQ chevron wind-up + brass halo pulse during open */
+.faq-item > summary {
+  position: relative;
+  transition: color var(--d-quick) var(--ease-out-quart);
+}
+.faq-item > summary::after {
+  transition: transform 80ms var(--ease-out-quart),
+              border-color var(--d-fg) var(--ease-emphasized);
+}
+.faq-item[open] > summary::after {
+  transition: transform 220ms 80ms var(--ease-emphasized),
+              border-color var(--d-fg) var(--ease-emphasized);
+}
+.faq-item > summary::before {
+  content: "";
+  position: absolute;
+  right: 0; top: 50%;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 60%);
+  transform: translate(4px, -50%) scale(0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+.faq-item[open] > summary::before {
+  animation: faqGlow 360ms var(--ease-out-quart);
+}
+@keyframes faqGlow {
+  0%   { opacity: 0;   transform: translate(4px, -50%) scale(0.6); }
+  50%  { opacity: 0.6; transform: translate(4px, -50%) scale(1); }
+  100% { opacity: 0;   transform: translate(4px, -50%) scale(1.2); }
+}
+
+/* FAQ open transition — modern grid-template-rows trick */
+.faq-item > div {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--d-fg) var(--ease-emphasized),
+              padding var(--d-fg) var(--ease-emphasized);
+  overflow: hidden;
+  padding-block: 0;
+}
+.faq-item > div > p { min-height: 0; }
+.faq-item[open] > div {
+  grid-template-rows: 1fr;
+  padding-block: var(--s-3) var(--s-2);
+}
+
+/* 4 — Form input brass underline on focus (coexists with focus ring) */
+.form-row { position: relative; }
+.form-row::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--d-fg) var(--ease-emphasized);
+  pointer-events: none;
+}
+.form-row:focus-within::after { transform: scaleX(1); }
+
+/* 5 + 8 — Nav and footer link brass underline (center-out) */
+.nav-link, .footer-links a { position: relative; }
+.nav-link::after, .footer-links a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: var(--accent);
+  transform-origin: center;
+  transform: scaleX(0);
+  transition: transform 300ms var(--ease-out-quart);
+}
+.nav-link:hover::after,
+.nav-link[aria-current="true"]::after,
+.footer-links a:hover::after { transform: scaleX(1); }
+
+/* 6 — Sticky CTA "ready" tease (one-shot, JS-triggered class) */
+.sticky-cta.is-ready .cta::after {
+  animation: stickyReady 800ms var(--ease-emphasized) 1;
+}
+@keyframes stickyReady {
+  0%, 100% { transform: scaleX(0.18); }
+  50%      { transform: scaleX(0.45); }
+}
+
+/* 7 — Arrow micro-jitter on CTA hover */
+.cta:hover .cta-arrow { animation: arrowJitter 220ms var(--ease-out-quart) 1; }
+@keyframes arrowJitter {
+  0%   { transform: translate(0, 0); }
+  35%  { transform: translate(2px, -0.5px); }
+  70%  { transform: translate(3px, 0.5px); }
+  100% { transform: translate(3px, 0); }
+}
+
+/* 12 — Pricing card inset brass glow on hover */
+.pricing {
+  transition: box-shadow var(--d-fg) var(--ease-out-quart),
+              border-color var(--d-fg) var(--ease-out-quart);
+}
+.pricing:hover {
+  box-shadow: inset 0 0 60px oklch(0.74 0.09 85 / 0.04);
+  border-color: var(--hairline-strong);
+}
+
+/* 13 — Section-head eyebrow hairline shimmer on hover */
+.section-head:hover .eyebrow::before {
+  animation: eyebrowShimmer 600ms var(--ease-emphasized) 1;
+}
+@keyframes eyebrowShimmer {
+  0%, 100% { background: var(--hairline-strong); }
+  50%      { background: var(--accent); }
+}
+
+/* Portrait caption — per-character spans (filled by JS at runtime) */
+.portrait-caption .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: charIn 320ms var(--ease-out-quart) both;
+  animation-delay: calc(var(--i, 0) * 18ms);
+  animation-play-state: paused;
+  will-change: transform, opacity;
+}
+.portrait-caption.is-typed .char { animation-play-state: running; }
+@keyframes charIn {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* MICRO reduced-motion path */
+@media (prefers-reduced-motion: reduce) {
+  .cta::after,
+  .faq-item[open] > summary::before,
+  .sticky-cta.is-ready .cta::after,
+  .cta:hover .cta-arrow,
+  .section-head:hover .eyebrow::before { animation: none !important; }
+  .bento-card::after,
+  .problem-card::after,
+  .checklist > li::after { display: none !important; }
+  .bento-card:hover h3,
+  .bento-card:hover .bento-num { transform: none !important; }
+  .pricing:hover { box-shadow: none !important; }
+  .portrait-caption .char {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .faq-item > div { transition: none !important; }
+}

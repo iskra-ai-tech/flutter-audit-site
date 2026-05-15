@@ -117,3 +117,110 @@ if (form) {
    double the JS budget for ~5% of users. The CSS @supports block hides the
    scroll-timeline keyframes from unsupported browsers, leaving elements in
    their static visible state. */
+
+/* ─── 5: Pricing scrub — $0 → $4,800 via @property + view() ─── */
+const pricingDigits = document.querySelector(".pricing-count-digits");
+const pricingHost   = document.querySelector(".pricing-count");
+if (pricingDigits && pricingHost && !reduce && supportsTimeline) {
+  const target = parseInt(pricingHost.dataset.pricingCount || "4800", 10);
+  const style = document.createElement("style");
+  style.textContent =
+    "@keyframes pricingScrub{from{--pricing-num:0}to{--pricing-num:" + target + "}}" +
+    ".pricing-count{animation:pricingScrub linear both;animation-timeline:view();animation-range:entry 10% cover 38%}";
+  document.head.appendChild(style);
+
+  const fmt = new Intl.NumberFormat("en-US");
+  let raf = 0, inView = false;
+  const tick = () => {
+    raf = 0;
+    const raw = getComputedStyle(pricingHost).getPropertyValue("--pricing-num");
+    const n = parseInt(raw, 10) || 0;
+    pricingDigits.textContent = fmt.format(n);
+    if (inView) raf = requestAnimationFrame(tick);
+  };
+  new IntersectionObserver((ents) => {
+    for (const e of ents) {
+      inView = e.isIntersecting;
+      if (inView && !raf) raf = requestAnimationFrame(tick);
+      if (!inView) pricingDigits.textContent = fmt.format(target);
+    }
+  }, { rootMargin: "20% 0% 20% 0%", threshold: 0 }).observe(pricingHost);
+} else if (pricingDigits) {
+  pricingDigits.textContent = "4,800";
+}
+
+/* ─── 6: Portrait caption — letter-by-letter on enter ─── */
+const cap = document.querySelector(".portrait-caption");
+if (cap && !reduce) {
+  let i = 0;
+  cap.querySelectorAll(":scope > span").forEach((s) => {
+    const txt = s.textContent || "";
+    s.textContent = "";
+    for (const ch of txt) {
+      const c = document.createElement("span");
+      c.className = "char";
+      c.style.setProperty("--i", String(i++));
+      c.textContent = ch === " " ? " " : ch;
+      s.appendChild(c);
+    }
+  });
+  const about = document.getElementById("about");
+  if (about) {
+    new IntersectionObserver((ents, obs) => {
+      for (const e of ents) if (e.isIntersecting) {
+        cap.classList.add("is-typed");
+        obs.unobserve(e.target);
+      }
+    }, { rootMargin: "0% 0% -20% 0%", threshold: 0.2 }).observe(about);
+  }
+}
+
+/* ─── 7: Micro-interactions — pointermove glow + magnetic CTAs ─── */
+if (!reduce) {
+  const hosts = document.querySelectorAll(".bento-card,.problem-card,.checklist>li");
+  const ctas  = document.querySelectorAll(".cta");
+  let pending = false, lastEv = null;
+  const onMove = (ev) => {
+    lastEv = ev;
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      if (!lastEv) return;
+      const target = lastEv.target;
+      const host = target && target.closest && target.closest(".bento-card,.problem-card,.checklist>li");
+      if (host) {
+        const r = host.getBoundingClientRect();
+        host.style.setProperty("--mx", ((lastEv.clientX - r.left) / r.width * 100) + "%");
+        host.style.setProperty("--my", ((lastEv.clientY - r.top)  / r.height * 100) + "%");
+      }
+      ctas.forEach((b) => {
+        const r = b.getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        const dx = lastEv.clientX - cx, dy = lastEv.clientY - cy;
+        const d = Math.hypot(dx, dy);
+        if (d < 80 && d > 0) {
+          const k = (1 - d / 80) * 1.5;
+          b.style.transform = "translate(" + (dx / d * k) + "px," + (dy / d * k) + "px)";
+        } else if (b.style.transform) {
+          b.style.transform = "";
+        }
+      });
+    });
+  };
+  addEventListener("pointermove", onMove, { passive: true });
+
+  /* ─── 8: Sticky CTA one-shot "ready" tease on first reveal ─── */
+  if (stickyCta) {
+    let fired = false;
+    addEventListener("scroll", () => {
+      if (fired || window.scrollY < innerHeight * 0.6) return;
+      if (stickyCta.dataset.hidden !== "true" &&
+          getComputedStyle(stickyCta).display !== "none") {
+        fired = true;
+        stickyCta.classList.add("is-ready");
+        setTimeout(() => stickyCta.classList.remove("is-ready"), 900);
+      }
+    }, { passive: true });
+  }
+}
