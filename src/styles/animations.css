@@ -1,0 +1,105 @@
+/* ============================================================
+   Scroll-driven animations — CSS-first, polyfilled if needed
+   Uses native CSS scroll-timeline API (Chrome 115+, Safari TP, FF 144+)
+   ============================================================ */
+
+/* ─── Pattern 1 — eyebrow + headline lift on enter ──────────── */
+@supports (animation-timeline: view()) {
+  .eyebrow,
+  .section-head h2,
+  .section-head .lede,
+  .problem-card,
+  .bento-card,
+  .process-step,
+  .pricing,
+  .philosophy,
+  .faq-item,
+  .about,
+  .proof-grid {
+    animation: revealLift linear both;
+    animation-timeline: view();
+    animation-range: entry 12% cover 28%;
+  }
+
+  /* Stagger sibling cards with custom property tricks */
+  .problem-card:nth-child(2),
+  .bento-card:nth-child(2) { animation-range: entry 14% cover 30%; }
+  .problem-card:nth-child(3),
+  .bento-card:nth-child(3) { animation-range: entry 16% cover 32%; }
+  .bento-card:nth-child(4) { animation-range: entry 18% cover 34%; }
+  .bento-card:nth-child(5) { animation-range: entry 20% cover 36%; }
+
+  /* Process step hairlines: draw left→right as the step enters */
+  .process-step-rule {
+    animation: ruleDraw linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+    transform: scaleX(0);
+  }
+
+  /* Pricing card: rise + the brass underline draws */
+  .pricing { animation-range: entry 8% cover 26%; }
+
+  /* About portrait: fade + slight scale on enter */
+  .portrait-frame {
+    animation: portraitIn linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 38%;
+  }
+}
+
+/* Fallback when scroll-timeline is unsupported — IntersectionObserver via JS */
+.js-reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--d-mid) var(--ease-emphasized),
+              transform var(--d-mid) var(--ease-emphasized);
+  will-change: transform, opacity;
+}
+
+.js-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Stagger siblings under a single .js-stagger parent */
+.js-stagger > .js-reveal:nth-child(2) { transition-delay: 80ms; }
+.js-stagger > .js-reveal:nth-child(3) { transition-delay: 160ms; }
+.js-stagger > .js-reveal:nth-child(4) { transition-delay: 240ms; }
+.js-stagger > .js-reveal:nth-child(5) { transition-delay: 320ms; }
+
+/* ─── Keyframes ─────────────────────────────────────────── */
+@keyframes revealLift {
+  0%   { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ruleDraw {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes portraitIn {
+  0%   { opacity: 0; transform: scale(0.98); filter: blur(3px); }
+  100% { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+/* Nav reveal-on-upscroll (orchestrated from motion.js) */
+.nav[data-revealed="false"] { transform: translateY(-100%); transition: transform var(--d-mid) var(--ease-emphasized); }
+.nav[data-revealed="true"]  { transform: translateY(0); transition: transform var(--d-mid) var(--ease-emphasized); }
+
+/* Reduced-motion path — all scroll-driven animations become no-ops */
+@media (prefers-reduced-motion: reduce) {
+  @supports (animation-timeline: view()) {
+    .eyebrow, .section-head h2, .section-head .lede,
+    .problem-card, .bento-card, .process-step, .pricing,
+    .philosophy, .faq-item, .about, .proof-grid,
+    .process-step-rule, .portrait-frame {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
+  }
+  .js-reveal { opacity: 1; transform: none; transition: none; }
+}

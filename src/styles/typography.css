@@ -1,0 +1,100 @@
+/* ============================================================
+   Typography — system stack, ratio-driven, editorial controls on
+   ============================================================ */
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--type-body);
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--bg);
+  background-color: var(--bg-hex); /* hex paint for first-byte parsers */
+  font-feature-settings: "ss01" on, "cv11" on;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  color: var(--ink-strong);
+  text-wrap: balance;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--type-display);  line-height: var(--lh-display);  letter-spacing: -0.025em; }
+h2 { font-size: var(--type-headline); line-height: var(--lh-headline); }
+h3 { font-size: var(--type-title);    line-height: var(--lh-title);    letter-spacing: -0.01em; }
+h4 { font-size: 1.125rem;             line-height: var(--lh-tight);    letter-spacing: -0.005em; }
+
+p {
+  text-wrap: pretty;
+  hanging-punctuation: first last;
+  max-width: var(--w-prose);
+}
+
+p + p { margin-top: var(--s-4); }
+
+.lede {
+  font-size: var(--type-lede);
+  line-height: var(--lh-lede);
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.muted { color: var(--ink-muted); }
+.faint { color: var(--ink-faint); }
+.strong { color: var(--ink-strong); }
+
+/* Mono label — uppercase tracked, sits on the page like a manifest entry */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  font-feature-settings: "tnum" on, "zero" on;
+}
+
+/* Meta — same family, tabular numerals (process day counters, prices) */
+.meta {
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: "tnum" on, "lnum" on;
+  letter-spacing: -0.02em;
+}
+
+/* Inline code-style */
+code, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  padding: 0.1em 0.35em;
+  background: var(--bg-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-1);
+  color: var(--ink-strong);
+}
+
+/* Editorial small-caps used sparingly */
+.caps {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+}
+
+/* Editorial drop-cap available but opt-in */
+.drop::first-letter {
+  font-size: 3em;
+  line-height: 0.85;
+  float: left;
+  padding-right: 0.06em;
+  padding-top: 0.05em;
+  color: var(--ink-strong);
+}

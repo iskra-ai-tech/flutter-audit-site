@@ -1,0 +1,8 @@
+.DS_Store
+node_modules/
+.vscode/
+.idea/
+public/
+!public/.keep
+.research/nikita-original.png
+.research/nikita-original.jpg

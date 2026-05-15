@@ -1,0 +1,116 @@
+/* ============================================================
+   Per-section refinements + bento layout for §3 deliverables
+   ============================================================ */
+
+.bento-num {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.bento-card h3 {
+  font-size: 1.1875rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.bento-card p {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.bento-card-edge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  letter-spacing: 0.04em;
+  margin-top: auto;
+}
+
+/* Inline secondary magnet — checklist callout */
+.inline-magnet {
+  margin-top: var(--s-6);
+  padding: var(--s-4) var(--s-5);
+  border: 1px dashed var(--hairline-strong);
+  border-radius: var(--r-2);
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  max-width: var(--w-narrow);
+}
+
+.inline-magnet strong {
+  color: var(--ink-strong);
+  font-weight: 500;
+}
+
+.inline-magnet a {
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 1px;
+  color: var(--ink-strong);
+  transition: border-color var(--d-quick) var(--ease-out-quart);
+}
+
+.inline-magnet a:hover {
+  border-bottom-color: var(--accent);
+}
+
+/* Philosophy — single editorial paragraph block */
+.philosophy {
+  max-width: 64ch;
+  font-size: clamp(1.125rem, 1.6vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.philosophy p + p { margin-top: var(--s-4); }
+
+/* Process: per-step hairlines that draw on scroll */
+.process-step-rule {
+  height: 1px;
+  background: var(--hairline);
+  transform-origin: left;
+  margin-bottom: var(--s-5);
+}
+
+/* Pricing — anchor row */
+.pricing-anchor {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+  flex-wrap: wrap;
+}
+
+.pricing-note {
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+}
+
+/* About — frame + caption block sit together */
+.about-body p + p { margin-top: var(--s-4); }
+.about-body { color: var(--ink); max-width: 56ch; }
+.about-body strong { color: var(--ink-strong); font-weight: 500; }
+
+/* CTA section final — single form with reassurance microcopy */
+.cta-section {
+  background:
+    radial-gradient(ellipse 80% 60% at 30% 0%,
+      oklch(0.20 0.012 250) 0%, transparent 60%),
+    var(--bg);
+}
+
+.cta-section .form { margin-top: var(--s-6); }
+
+/* Subtle hairline drop where sections meet — only between adjacent sections */
+.section:first-of-type { border-top: 0; }

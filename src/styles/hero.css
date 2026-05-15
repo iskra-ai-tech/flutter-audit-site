@@ -1,0 +1,208 @@
+/* ============================================================
+   Hero — 4-layer entrance, composite-only, pixel-perfect
+   Layers: grid (bg, slow) · hairline (mid) · type (mid-fg) · caret (fg)
+   ============================================================ */
+
+.hero {
+  position: relative;
+  padding-block: clamp(5.5rem, 11vw, 9.5rem) clamp(3.5rem, 7vw, 6rem);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.hero-page {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: var(--s-5);
+  max-width: var(--w-narrow);
+}
+
+/* ─── Layer 1 — dot grid ─────────────────────────────────── */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(oklch(0.27 0.006 250) 0.7px, transparent 0.7px);
+  background-size: 28px 28px;
+  background-position: -2px -2px;
+  mask-image: radial-gradient(ellipse 64% 70% at 35% 35%,
+                              #000 0%, #000 40%, transparent 92%);
+  opacity: 0;
+  transform: scale(0.985);
+  animation: heroGrid var(--d-slow) var(--ease-emphasized) 60ms forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes heroGrid {
+  0%   { opacity: 0; transform: scale(0.985); }
+  100% { opacity: 0.55; transform: scale(1); }
+}
+
+/* ─── Layer 2 — accent hairline (the one appearance of brass) ─── */
+.hero-rule {
+  display: block;
+  width: 140px;
+  height: 1px;
+  border: 0;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  margin: var(--s-2) 0 var(--s-4);
+  animation: heroRule var(--d-mid) var(--ease-out-quart) 200ms forwards;
+  will-change: transform;
+}
+
+@keyframes heroRule {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+/* ─── Layer 3 — type stack (eyebrow → byline → H1 lines → lede → ctas) ─── */
+.hero-eyebrow,
+.hero-byline,
+.hero-headline .line,
+.hero-lede,
+.hero-ctas,
+.hero-trust {
+  opacity: 0;
+  transform: translateY(8px);
+  will-change: transform, opacity;
+  animation: heroLift var(--d-fg) var(--ease-emphasized) forwards;
+}
+
+/* Compressed stagger — total composition lands at ~920 ms so the trust line
+   is visible before any scroll. Asymmetric: type lines are foreground (280 ms),
+   the brass rule is mid-layer (460 ms), the grid is bg-layer (1.1 s). */
+.hero-eyebrow      { animation-delay:  60ms; }
+.hero-byline       { animation-delay: 120ms; }
+.hero-headline .line:nth-child(1) { animation-delay: 220ms; }
+.hero-headline .line:nth-child(2) { animation-delay: 280ms; }
+.hero-headline .line:nth-child(3) { animation-delay: 340ms; }
+.hero-lede        { animation-delay: 440ms; }
+.hero-ctas        { animation-delay: 540ms; }
+.hero-trust       { animation-delay: 640ms; }
+
+@keyframes heroLift {
+  0%   { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Eyebrow + byline structure ─── */
+.hero-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.hero-byline {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  font-size: 0.9375rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.hero-byline-portrait {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--hairline-strong);
+  background: var(--bg-elevated);
+  flex-shrink: 0;
+}
+
+/* ─── H1 stacked lines ─── */
+.hero-headline {
+  font-size: var(--type-display);
+  line-height: var(--lh-display);
+  letter-spacing: -0.025em;
+  font-weight: 600;
+  color: var(--ink-strong);
+  margin-block: var(--s-2) 0;
+}
+
+.hero-headline .line {
+  display: block;
+}
+
+.hero-headline .line:nth-child(3) {
+  color: var(--ink-muted);
+}
+
+/* ─── Lede ─── */
+.hero-lede {
+  font-size: var(--type-lede);
+  line-height: var(--lh-lede);
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  max-width: 56ch;
+}
+
+/* ─── CTAs row ─── */
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--s-5);
+  margin-top: var(--s-3);
+}
+
+.hero-trust {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  margin-top: var(--s-2);
+}
+
+/* ─── Layer 4 — caret (after headline finishes) ─── */
+.hero-caret {
+  display: inline-block;
+  width: 0.45em;
+  height: 1em;
+  margin-left: 0.08em;
+  background: var(--accent);
+  vertical-align: -0.10em;
+  opacity: 0;
+  /* Caret fades in after the headline finishes, blinks 5 times, then settles
+     visible. No infinite animation — that's main-thread + battery cost for
+     decoration. */
+  animation: caretIn 220ms var(--ease-out-quart) 740ms forwards,
+             caretBlink 1.2s steps(2) 900ms 5 forwards;
+  transform-origin: bottom center;
+}
+@keyframes caretIn { from { opacity: 0; transform: scaleY(0.5); } to { opacity: 1; transform: scaleY(1); } }
+@keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* Reduced-motion path — collapse to opacity-only fades, no transforms.
+   Selectors split so we never rely on source-order tiebreaking. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-eyebrow, .hero-byline, .hero-headline .line,
+  .hero-lede, .hero-ctas, .hero-trust {
+    animation-duration: 120ms !important;
+    animation-iteration-count: 1 !important;
+    animation-timing-function: linear !important;
+    transform: none !important;
+  }
+  .hero-grid {
+    animation: none !important;
+    opacity: 0.55 !important;
+    transform: none !important;
+  }
+  .hero-rule {
+    animation: none !important;
+    transform: scaleX(1) !important;
+  }
+  .hero-caret { display: none; }
+}

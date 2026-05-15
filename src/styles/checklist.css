@@ -1,0 +1,90 @@
+/* ============================================================
+   Checklist — 12-point Flutter performance checklist (§3b)
+   Public-on-the-page lead magnet, no email required
+   ============================================================ */
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--hairline);
+  border-left: 1px solid var(--hairline);
+  border-radius: var(--r-3);
+  overflow: hidden;
+}
+
+@media (max-width: 720px) {
+  .checklist { grid-template-columns: 1fr; }
+}
+
+.checklist > li {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border-right: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--bg);
+  transition: background var(--d-quick) var(--ease-out-quart);
+  position: relative;
+}
+
+.checklist > li:hover { background: var(--bg-elevated); }
+
+.cl-num {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  padding-top: 0.2rem;
+}
+
+.checklist h3 {
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  margin-bottom: var(--s-2);
+  color: var(--ink-strong);
+}
+
+.checklist p {
+  color: var(--ink-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+}
+
+.checklist em {
+  font-family: var(--font-mono);
+  font-style: normal;
+  color: var(--ink);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  margin-right: 0.3em;
+}
+
+.checklist-foot {
+  margin-top: var(--s-5);
+  color: var(--ink-muted);
+  max-width: 64ch;
+  font-style: italic;
+}
+
+/* When scroll-driven supported, stagger each item with view-timeline ranges. */
+@supports (animation-timeline: view()) {
+  .checklist > li {
+    animation: revealLift linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 22%;
+  }
+  /* Subtle stagger across rows */
+  .checklist > li:nth-child(odd)  { animation-range: entry 10% cover 24%; }
+  .checklist > li:nth-child(even) { animation-range: entry 14% cover 28%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checklist > li { animation: none !important; opacity: 1 !important; transform: none !important; }
+}

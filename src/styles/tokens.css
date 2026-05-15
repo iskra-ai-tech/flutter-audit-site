@@ -1,0 +1,118 @@
+/* ============================================================
+   Design tokens — Hybrid D+A "Ink & Brass"
+   Locked in .design/DOCTRINE.md §3
+   APCA targets: body Lc 87, muted Lc 58, headlines Lc 96
+   ============================================================ */
+
+:root {
+  /* Surfaces — cool-tinted near-black, NOT #000.
+     P04-revised: chroma raised 0.005→0.010 so the tint is actually perceivable. */
+  --bg:              oklch(0.145 0.010 250);
+  --bg-elevated:     oklch(0.185 0.012 250);
+  --bg-deep:         oklch(0.110 0.010 250);
+
+  /* Ink — P04-revised: ink-strong dropped 0.97→0.94 to kill HDR halation
+     while keeping APCA Lc ≈ 90 against bg. */
+  --ink-strong:      oklch(0.94 0.005 250);
+  --ink:             oklch(0.88 0.005 250);
+  --ink-muted:       oklch(0.66 0.008 250);
+  --ink-faint:       oklch(0.62 0.008 250);   /* WCAG-AA 4.5:1 verified */
+
+  /* Hairlines — hue-matched solids */
+  --hairline:        oklch(0.22 0.008 250);
+  --hairline-strong: oklch(0.27 0.008 250);
+
+  /* Accent — P04-revised: champagne (cooler, lower-chroma) instead of brass.
+     Avoids the Vivid-mode hue drift to "construction warning orange" and the
+     tritan-color-deficiency collision with ink-muted. */
+  --accent:          oklch(0.74 0.09 85);
+  --accent-quiet:    oklch(0.58 0.06 85);
+  --accent-soft:     oklch(0.74 0.09 85 / 0.40);  /* 40% echo for hero hairline */
+
+  /* Signals — used only in form validation + FAQ open state */
+  --signal-positive: oklch(0.78 0.14 150);
+  --signal-warning:  oklch(0.82 0.15  85);
+  --signal-danger:   oklch(0.70 0.18  25);
+
+  /* HEX fallbacks for old browsers (paint same near-black) */
+  --bg-hex:          #0E1014;
+  --ink-hex:         #DFDFE3;
+  --accent-hex:      #D9A463;
+
+  /* Typography stack — system only, 0 KB */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
+               "Helvetica Neue", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code",
+               Menlo, Consolas, "Roboto Mono", monospace;
+
+  /* Type scale — perfect-fourth (1.333) */
+  --type-display:  clamp(2.75rem, 7.2vw, 5.625rem);
+  --type-headline: clamp(1.875rem, 4.4vw, 3.0rem);
+  --type-title:    1.5rem;
+  --type-lede:     clamp(1.0625rem, 1.6vw, 1.25rem);
+  --type-body:     1rem;
+  --type-small:    0.875rem;
+  --type-label:    0.75rem;
+  --type-meta:     0.75rem;
+
+  /* Line heights tuned per role */
+  --lh-display:  1.02;
+  --lh-headline: 1.08;
+  --lh-title:    1.25;
+  --lh-lede:     1.55;
+  --lh-body:     1.65;
+  --lh-small:    1.55;
+  --lh-tight:    1.2;
+
+  /* Spacing scale — modular, 4px base × Fibonacci-ish jumps */
+  --s-0:  0;
+  --s-1:  0.25rem;  /*  4px */
+  --s-2:  0.5rem;   /*  8px */
+  --s-3:  0.75rem;  /* 12px */
+  --s-4:  1rem;     /* 16px */
+  --s-5:  1.5rem;   /* 24px */
+  --s-6:  2rem;     /* 32px */
+  --s-7:  3rem;     /* 48px */
+  --s-8:  4rem;     /* 64px */
+  --s-9:  6rem;     /* 96px */
+  --s-10: 8rem;     /* 128px */
+  --s-11: 12rem;    /* 192px */
+
+  /* Container widths */
+  --w-prose:     40rem;   /* 640px — editorial reading column */
+  --w-page:      72rem;   /* 1152px — desktop max */
+  --w-narrow:    52rem;   /* 832px — hero, lede, form */
+
+  /* Border radii — restrained */
+  --r-1: 4px;
+  --r-2: 6px;
+  --r-3: 10px;
+  --r-pill: 999px;
+
+  /* Easing palette — exactly 4 named curves */
+  --ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  --ease-out-quart:  cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-linear:     linear;
+  --ease-spring:     linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.55 10.6%,
+                            0.717 13.6%, 0.864, 1.005 20.1%, 1.063 22.3%,
+                            1.094, 1.114, 1.123, 1.123, 1.117, 1.107 33.7%,
+                            1.084 37.5%, 1.027 47%, 1.005 53%, 0.989 60%,
+                            0.984 71%, 0.998 100%);
+
+  /* Durations */
+  --d-quick:    140ms;
+  --d-fg:       280ms;
+  --d-mid:      460ms;
+  --d-bg:       900ms;
+  --d-slow:    1200ms;
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+/* Light-mode override (paint the dark site if user disables dark) — minor support */
+@media (prefers-color-scheme: light) {
+  :root {
+    color-scheme: dark; /* commit to dark; the page is dark */
+  }
+}

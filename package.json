@@ -1,0 +1,23 @@
+{
+  "name": "flutter-audit-site",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Single-page portfolio: senior Flutter engineer offering 5-day fixed-price Flutter app audits.",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "dev": "node tools/dev.mjs",
+    "preview": "node tools/dev.mjs --preview",
+    "perf": "node tools/perf.mjs",
+    "install-photo": "node tools/install-photo.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.2",
+    "html-minifier-terser": "^7.2.0",
+    "csso": "^5.0.5",
+    "terser": "^5.31.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

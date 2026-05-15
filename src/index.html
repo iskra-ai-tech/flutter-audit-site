@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0E1014">
+
+<title>{{site.title}}</title>
+<meta name="description" content="{{site.description}}">
+<link rel="canonical" href="{{site.origin}}/">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Nikita Kalaganov — Flutter App Audit">
+<meta property="og:title" content="{{site.title}}">
+<meta property="og:description" content="{{site.description}}">
+<meta property="og:image" content="{{site.origin}}{{site.ogImage}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Flutter App Audit — Senior engineer, fixed price, 5 days.">
+<meta property="og:url" content="{{site.origin}}/">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{site.title}}">
+<meta name="twitter:description" content="{{site.description}}">
+<meta name="twitter:image" content="{{site.origin}}{{site.ogImage}}">
+
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="format-detection" content="telephone=no">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="author" content="Nikita Kalaganov">
+<meta name="generator" content="hand-authored">
+<meta name="rating" content="general">
+<meta name="ai-content-declaration" content="hand-authored, original">
+
+<link rel="me" href="https://github.com/nikitakalaganov">
+<link rel="me" href="https://www.linkedin.com/in/nikitakalaganov/">
+<link rel="me" href="https://stackoverflow.com/users/me/nikita-kalaganov">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230E1014'/%3E%3Ccircle cx='16' cy='16' r='6' fill='none' stroke='%23D9A463' stroke-width='1.5'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%230E1014'/%3E%3Ccircle cx='90' cy='90' r='34' fill='none' stroke='%23D9A463' stroke-width='8'/%3E%3C/svg%3E">
+
+<!-- LCP hint: byline portrait (small) is above-the-fold; preload the smallest variant. -->
+<link rel="preload" as="image" href="/assets/portrait-320.avif" type="image/avif" fetchpriority="high">
+
+<!-- llms.txt + sitemap discovery -->
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="alternate" type="text/plain" title="llms.txt" href="/llms.txt">
+
+<!-- Speculation rules: speed up internal anchor jumps + same-origin prefetch -->
+<script type="speculationrules">
+{ "prerender": [{ "source": "list", "urls": ["/"] }] }
+</script>
+
+<!--%STYLES%-->
+
+<!-- Structured data — single @graph with WebSite, Organization, Person, Service, WebPage, FAQPage, BreadcrumbList -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "{{site.origin}}/#website",
+      "url": "{{site.origin}}/",
+      "name": "Nikita Kalaganov — Flutter App Audit",
+      "publisher": { "@id": "{{site.origin}}/#person" },
+      "inLanguage": "en-US"
+    },
+    {
+      "@type": "Person",
+      "@id": "{{site.origin}}/#person",
+      "name": "Nikita Kalaganov",
+      "jobTitle": "Senior Flutter Engineer",
+      "url": "{{site.origin}}/",
+      "image": "{{site.origin}}/assets/portrait-640.webp",
+      "sameAs": [
+        "https://github.com/nikitakalaganov",
+        "https://www.linkedin.com/in/nikitakalaganov/",
+        "https://stackoverflow.com/users/me/nikita-kalaganov"
+      ],
+      "knowsAbout": [
+        "Flutter", "Dart", "Impeller", "Skia", "shaders", "vector_math_64",
+        "frame timeline analysis", "Flutter performance",
+        "Flutter architecture", "Flutter state management",
+        "Flutter custom animations", "Flutter app audit"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "{{site.origin}}/#org",
+      "name": "Nikita Kalaganov — Flutter App Audit",
+      "url": "{{site.origin}}/",
+      "logo": "{{site.origin}}/assets/portrait-320.webp",
+      "founder": { "@id": "{{site.origin}}/#person" }
+    },
+    {
+      "@type": "Service",
+      "@id": "{{site.origin}}/#service",
+      "name": "Flutter App Audit",
+      "serviceType": "Code audit",
+      "category": "Mobile app code audit",
+      "provider": { "@id": "{{site.origin}}/#person" },
+      "areaServed": "Worldwide",
+      "audience": {
+        "@type": "BusinessAudience",
+        "audienceType": "Founders, CTOs, heads of engineering operating production Flutter apps"
+      },
+      "description": "Five-day fixed-price audit of a Flutter app. Ranked fix list, frame-by-frame performance report, two-page brief, 60-minute walkthrough call.",
+      "offers": {
+        "@type": "Offer",
+        "price": "4800",
+        "priceCurrency": "USD",
+        "priceSpecification": {
+          "@type": "PriceSpecification",
+          "minPrice": "4800",
+          "priceCurrency": "USD",
+          "description": "Typical 5-day audit; the quote firms after intake."
+        },
+        "availability": "https://schema.org/InStock"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "{{site.origin}}/#webpage",
+      "url": "{{site.origin}}/",
+      "name": "{{site.title}}",
+      "isPartOf": { "@id": "{{site.origin}}/#website" },
+      "about": { "@id": "{{site.origin}}/#service" },
+      "primaryImageOfPage": "{{site.origin}}/assets/portrait-640.webp",
+      "speakable": {
+        "@type": "SpeakableSpecification",
+        "cssSelector": ["#hero-headline", "#hero-lede", ".faq-item > summary"]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "{{site.origin}}/#breadcrumb",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Flutter App Audit", "item": "{{site.origin}}/" }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "{{site.origin}}/#faq",
+      "mainEntity": [
+        { "@type": "Question", "name": "Why an audit instead of just hiring a senior Flutter engineer?", "acceptedAnswer": { "@type": "Answer", "text": "Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question." } },
+        { "@type": "Question", "name": "We cannot share the repo. Is there another way?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. About a third of the audits I do are on screen-share only. Your engineer drives, I look, we record. Same deliverables, same price." } },
+        { "@type": "Question", "name": "Our app is not slow, it is just messy. Is the audit still useful?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, possibly more so. Performance audits get the headlines, architectural audits change quarters." } },
+        { "@type": "Question", "name": "How is this different from running flutter analyze or a code-quality SaaS?", "acceptedAnswer": { "@type": "Answer", "text": "flutter analyze tells you what is syntactically wrong. The audit tells you what is strategically wrong. A linter sees code. The audit sees decisions." } },
+        { "@type": "Question", "name": "What if you find the problem is too big for a 5-day audit?", "acceptedAnswer": { "@type": "Answer", "text": "I tell you on Day 2, refund the unused portion, and write up what I have found so far in whatever shape is useful to you." } },
+        { "@type": "Question", "name": "Do you do the fixes too?", "acceptedAnswer": { "@type": "Answer", "text": "Usually no. The audit is the product. For unusual cases I take implementation work, but only after the audit, and only if you ask." } }
+      ]
+    }
+  ]
+}
+</script>
+</head>
+<body>
+
+<a href="#top" class="visually-hidden">Skip to content</a>
+
+<header class="nav" data-revealed="true">
+  <a class="nav-brand" href="#top">nikita.audit</a>
+  <nav class="nav-links" aria-label="Sections">
+    <a class="nav-link" href="#problem">Problem</a>
+    <a class="nav-link" href="#deliverables">Deliverables</a>
+    <a class="nav-link" href="#process">Process</a>
+    <a class="nav-link" href="#pricing">Pricing</a>
+    <a class="nav-link" href="#faq">FAQ</a>
+    <a class="nav-link" href="#about">About</a>
+  </nav>
+  <a class="nav-cta" href="#book">Book the audit</a>
+</header>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     1. HERO  —  4-layer entrance, composite-only
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section hero" id="top">
+  <div class="hero-grid" aria-hidden="true"></div>
+  <div class="page hero-page">
+    <div class="hero-eyebrow"><span aria-hidden="true">2026</span> · Senior Flutter engineer · One audit at a time</div>
+
+    <p class="hero-byline">
+      <picture>
+        <source type="image/avif" srcset="/assets/portrait-320.avif 1x, /assets/portrait-480.avif 2x">
+        <source type="image/webp" srcset="/assets/portrait-320.webp 1x, /assets/portrait-480.webp 2x">
+        <img class="hero-byline-portrait" src="/assets/portrait-320.webp" alt="" width="32" height="32" loading="eager" fetchpriority="high" decoding="async">
+      </picture>
+      <span>By <strong>Nikita Kalaganov</strong> — senior Flutter engineer. The page below is the offer.</span>
+    </p>
+
+    <h1 class="hero-headline" id="hero-headline">
+      <span class="line">Your Flutter app is fixable.</span>
+      <span class="line">In a week.</span>
+      <span class="line">Without a rewrite.<span class="hero-caret" aria-hidden="true"></span></span>
+    </h1>
+
+    <hr class="hero-rule">
+
+    <p class="hero-lede" id="hero-lede">
+      Five days. One senior engineer. A ranked fix list, a frame timeline, and a walkthrough. Fixed price, quoted after I see the repo.
+    </p>
+
+    <div class="hero-ctas">
+      <a class="cta" href="#book">
+        Send me your repo
+        <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+      </a>
+      <a class="cta-secondary" href="#checklist">Read the 12-point checklist first</a>
+    </div>
+
+    <p class="hero-trust">
+      Audits shipped to Series A through Series C teams · NDA on request · 24-hour first reply
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     2. PROBLEM
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="problem" aria-labelledby="problem-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">01</span>&nbsp;Symptoms</p>
+      <h2 id="problem-h">Three sentences you have already said this quarter.</h2>
+    </header>
+
+    <div class="problem-grid js-stagger">
+      <article class="problem-card js-reveal">
+        <p class="num">01</p>
+        <h3>The app got slower and nobody knows when.</h3>
+        <p>The first run after install has a frame storm. The home tab scrolls like it is underwater on mid-tier Android. A reviewer wrote “feels laggy” last month and you closed the tab. Your team noticed. You noticed. No one has said it out loud in standup.</p>
+      </article>
+      <article class="problem-card js-reveal">
+        <p class="num">02</p>
+        <h3>Adding one feature touches eight files.</h3>
+        <p>State lives in three libraries because three engineers each had a favourite. A custom animation in <code>home_screen.dart</code> is untouchable. Tracing a bug is five directories and a Slack thread from 2024. Velocity has half of what it had a year ago.</p>
+      </article>
+      <article class="problem-card js-reveal">
+        <p class="num">03</p>
+        <h3>Onboarding the new senior takes a month.</h3>
+        <p>They are good. They are senior. They still spend three weeks in the codebase before they ship anything, because no one wrote down which 200 lines actually decide the app. The thing inside the codebase that should be obvious is not.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     3. DELIVERABLES
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="deliverables" aria-labelledby="deliv-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">02</span>&nbsp;Deliverables</p>
+      <h2 id="deliv-h">A short list, a real report, and an hour with your team.</h2>
+      <p class="lede muted">The audit is one product. Not a retainer, not a sales call. You get five things and you keep them.</p>
+    </header>
+
+    <div class="bento js-stagger">
+      <article class="bento-card wide js-reveal">
+        <p class="bento-num">D01</p>
+        <h3>A ranked fix list short enough to ship this sprint.</h3>
+        <p>Five to ten items, ordered by impact and effort, with the file and line where to start. Not a backlog. The audit ends with a sprint, not a wishlist.</p>
+        <p class="bento-card-edge"><span>OUTPUT</span><span>Markdown · 1–2 pages</span></p>
+      </article>
+      <article class="bento-card tall js-reveal">
+        <p class="bento-num">D02</p>
+        <h3>Frame-by-frame perf report.</h3>
+        <p>Before/after timings for your three worst screens, captured on real devices. The bottleneck is named.</p>
+        <p class="bento-card-edge"><span>OUTPUT</span><span>HTML + screenshots</span></p>
+      </article>
+      <article class="bento-card tall js-reveal">
+        <p class="bento-num">D03</p>
+        <h3>A plain-English brief.</h3>
+        <p>Two pages your CFO can read. Risk, cost, fix. Send up the chain without translating.</p>
+        <p class="bento-card-edge"><span>OUTPUT</span><span>PDF · 2 pages</span></p>
+      </article>
+      <article class="bento-card wide js-reveal">
+        <p class="bento-num">D04</p>
+        <h3>A 60-minute walkthrough with your team.</h3>
+        <p>Engineers shipping the code in the room, real-time questions, recorded. The team leaves knowing what to do Monday morning.</p>
+        <p class="bento-card-edge"><span>OUTPUT</span><span>Recorded call · 1 hr</span></p>
+      </article>
+      <article class="bento-card full js-reveal">
+        <p class="bento-num">D05</p>
+        <h3>A roadmap that survives me leaving.</h3>
+        <p>Notes, diagrams, naming conventions, and the three architectural decisions I would make next. The audit pays off long after I am out of your Slack.</p>
+        <p class="bento-card-edge"><span>OUTPUT</span><span>Markdown + diagrams</span></p>
+      </article>
+    </div>
+
+    <p class="inline-magnet">
+      <strong>Preview:</strong> the 12-point Flutter performance checklist used for every audit.
+      <a href="#checklist" data-action="checklist">Read it below ↓</a>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     3b. CHECKLIST — the 12-point Flutter performance checklist
+          (no-friction lead magnet: read on the page, no email required)
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="checklist" aria-labelledby="cl-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">02b</span>&nbsp;Free · Read on the page</p>
+      <h2 id="cl-h">The 12-point Flutter performance checklist.</h2>
+      <p class="lede muted">The exact warm-pass I run against every codebase on Day 1, before I touch DevTools. Public on purpose. If your team can clear all twelve, you probably do not need me.</p>
+    </header>
+
+    <ol class="checklist">
+      <li><div class="cl-num">01</div><div><h3>Const constructors everywhere they belong.</h3><p>Every widget that does not depend on dynamic state should be <code>const</code>. Non-const subtrees rebuild on every parent <code>setState</code>; const subtrees skip the diff entirely. <em>Grep:</em> <code>final\s+\w+\s*=\s*Widget</code> without <code>const</code>.</p></div></li>
+      <li><div class="cl-num">02</div><div><h3>RepaintBoundary around every animated subtree.</h3><p>Animating children without a <code>RepaintBoundary</code> repaints the parent layer on every frame. Free 30–40% paint cost on animated screens. <em>Check:</em> the Flutter DevTools <em>Performance Overlay</em> red bars.</p></div></li>
+      <li><div class="cl-num">03</div><div><h3>Shader warm-up on first frame.</h3><p>First-run jank is almost always shader compilation. Pre-compile with <code>--cache-sksl-path</code> on iOS, ship the warm cache, or pre-paint signature widgets on a hidden frame. <em>Symptom:</em> the first scroll is jankier than the second.</p></div></li>
+      <li><div class="cl-num">04</div><div><h3>Lists ship via <code>builder</code> or slivers.</h3><p>Eager <code>ListView(children: [ … ])</code> mounts every child on first frame. Above ~12 items you are paying for content that has never been on screen. <em>Fix:</em> always <code>ListView.builder</code> or a <code>CustomScrollView</code> of slivers.</p></div></li>
+      <li><div class="cl-num">05</div><div><h3>Images decode at display size, not source size.</h3><p>A 2000×2000 hero rendered at 200×200 still decodes 16 MB of pixels on the main thread. <em>Fix:</em> <code>cacheWidth</code>/<code>cacheHeight</code> on <code>Image</code>, <code>ResizeImage</code>, and <code>precacheImage</code> for known-soon assets.</p></div></li>
+      <li><div class="cl-num">06</div><div><h3>No side effects inside <code>build()</code>.</h3><p>No <code>setState</code>, no provider notifications, no async kick-offs. <code>build</code> runs unpredictably often; side effects there are the source of half of the rebuild storms I find.</p></div></li>
+      <li><div class="cl-num">07</div><div><h3>State scope is the smallest leaf, not the whole screen.</h3><p>A <code>setState</code> in <code>HomeScreenState</code> rebuilds the entire home screen. <em>Fix:</em> <code>ValueListenableBuilder</code>, <code>Selector</code> on a Provider, or a small inner <code>StatefulBuilder</code>.</p></div></li>
+      <li><div class="cl-num">08</div><div><h3>Providers and notifiers do not over-broadcast.</h3><p>Top-level <code>ChangeNotifier</code> with <code>notifyListeners()</code> in a hot path rebuilds every listener in the tree. <em>Fix:</em> split state, use <code>Selector</code>, or replace with a Riverpod <code>StateNotifier</code> with narrower outputs.</p></div></li>
+      <li><div class="cl-num">09</div><div><h3>Animation controllers are disposed.</h3><p>Every <code>AnimationController</code> needs a matching <code>dispose</code>. Leaked tickers keep firing for the life of the app — invisible to the user, lethal to long sessions on mid-tier Android.</p></div></li>
+      <li><div class="cl-num">10</div><div><h3><code>CustomPainter.shouldRepaint</code> says <em>no</em> by default.</h3><p>The default is <em>repaint always</em>. Override <code>shouldRepaint</code> to return <code>false</code> when nothing relevant changed. Free win on any signature paint.</p></div></li>
+      <li><div class="cl-num">11</div><div><h3>No async bursts in <code>initState</code>.</h3><p>Multiple awaited futures in <code>initState</code> stall the first frame. <em>Fix:</em> kick them off without awaiting, render a skeleton, fill in as data arrives. The first frame is the impression.</p></div></li>
+      <li><div class="cl-num">12</div><div><h3>Build graph depth under ~20 in hot paths.</h3><p>Every layer is a <code>Element</code> diff per rebuild. A 35-deep widget tree in a list item is the silent tax that turns a 60 FPS screen into a 38 FPS one. <em>Fix:</em> hoist subtrees behind <code>const</code> or extract them to siblings.</p></div></li>
+    </ol>
+
+    <p class="checklist-foot meta">If two or more of these are violated in your codebase, the audit usually pays for itself in the first PR you do not have to write.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     4. PHILOSOPHY (replaces placeholder Proof)
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="philosophy" aria-labelledby="phil-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">03</span>&nbsp;How I read code</p>
+      <h2 id="phil-h">A code audit is not a code review.</h2>
+    </header>
+
+    <div class="philosophy js-reveal">
+      <p>A code review tells you what is syntactically wrong. An audit tells you what is strategically wrong. Which decision from 2023 is costing a week per release. Which custom animation will bite you on the next Flutter version. Which third of your providers can be deleted.</p>
+      <p>A linter sees code; the audit sees decisions. Five days is enough because the diagnosis is the hard part. The fix list is short on purpose. Most of the value is what is no longer there.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     5. PROCESS
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="process" aria-labelledby="proc-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">04</span>&nbsp;How it runs</p>
+      <h2 id="proc-h">Five days. Same shape every time.</h2>
+    </header>
+
+    <div class="process">
+      <div class="process-step js-reveal">
+        <div class="process-day">DAY 0</div>
+        <div>
+          <h3>You send the repo.</h3>
+          <p>GitHub, GitLab, Bitbucket, or a zip. One symptom in your own words. NDA before code changes hands. I reply within 24 hours either confirming we are a fit or telling you exactly why we are not.</p>
+        </div>
+      </div>
+      <div class="process-step js-reveal">
+        <div class="process-day">DAYS 1–3</div>
+        <div>
+          <h3>Inside the code.</h3>
+          <p>Day 1 is reading. Days 2 and 3 are profiling on real devices: frame timelines, memory, GPU, build graph, dependency map. I ping you with questions and do not disappear.</p>
+        </div>
+      </div>
+      <div class="process-step js-reveal">
+        <div class="process-day">DAY 4</div>
+        <div>
+          <h3>The report.</h3>
+          <p>The fix list, the perf report, the two-page brief, the roadmap notes. Delivered the morning of Day 5.</p>
+        </div>
+      </div>
+      <div class="process-step js-reveal">
+        <div class="process-day">DAY 5</div>
+        <div>
+          <h3>The walkthrough.</h3>
+          <p>One hour, your engineers in the room, screen-share through the findings. Every question answered. Recorded for whoever could not make it. Two weeks of async clarifications + PR review after.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     6. PRICING
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="pricing" aria-labelledby="price-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">05</span>&nbsp;Price</p>
+      <h2 id="price-h">One price. Quoted after I see the repo.</h2>
+    </header>
+
+    <div class="pricing js-reveal">
+      <div class="pricing-anchor">
+        <span class="pricing-amount"><span class="num">$4,800</span><span class="pricing-amount-unit">USD · from</span></span>
+      </div>
+      <p class="pricing-note">Typical 5-day audit; the quote firms after the intake call.</p>
+
+      <ul class="pricing-list">
+        <li>Five working days inside your codebase</li>
+        <li>Full deliverable set: fix list, perf report, brief, walkthrough</li>
+        <li>Two weeks of async follow-up + PR review</li>
+        <li>NDA on request, before code changes hands</li>
+      </ul>
+
+      <p class="pricing-reassurance">
+        The price is fixed when I quote it. If the work takes me longer than I scoped, you pay what we agreed and nothing more. If by Day 2 I find the audit cannot deliver what I quoted for, I tell you, refund the unspent half, and send everything I have so far in whatever shape is useful.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     7. FAQ — native <details>, first open for SEO + AIO
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="faq" aria-labelledby="faq-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">06</span>&nbsp;Questions</p>
+      <h2 id="faq-h">Six questions, six answers.</h2>
+    </header>
+
+    <div class="faq">
+      <details class="faq-item js-reveal" open>
+        <summary>Why an audit instead of just hiring a senior Flutter engineer?</summary>
+        <div><p>Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question. The audit is the cheapest way to find out what hiring will not fix.</p></div>
+      </details>
+      <details class="faq-item js-reveal">
+        <summary>We cannot share the repo. Is there another way?</summary>
+        <div><p>Yes. About a third of the audits I do are on screen-share only. Your engineer drives, I look, we record. The deliverables are the same. The price is the same. The only thing different is who has the keyboard.</p></div>
+      </details>
+      <details class="faq-item js-reveal">
+        <summary>Our app is not slow. It is just messy. Is the audit still useful?</summary>
+        <div><p>Yes, possibly more so. Performance audits get the headlines, architectural audits change quarters. If your team is touching eight files for a one-field change, you do not have a performance problem, you have a velocity problem. Same audit, different fix-list categories.</p></div>
+      </details>
+      <details class="faq-item js-reveal">
+        <summary>How is this different from running <code>flutter analyze</code> or a code-quality SaaS?</summary>
+        <div><p><code>flutter analyze</code> tells you what is syntactically wrong. The audit tells you what is strategically wrong. A linter sees code. I see decisions.</p></div>
+      </details>
+      <details class="faq-item js-reveal">
+        <summary>What if you find the problem is too big for a 5-day audit?</summary>
+        <div><p>I tell you on Day 2, refund the unused portion of the fee, and write up what I have found so far in whatever shape is useful to you. If you want a case where this happened in real life, ask on the intake call. I will walk you through it with the client’s permission.</p></div>
+      </details>
+      <details class="faq-item js-reveal">
+        <summary>Do you do the fixes too?</summary>
+        <div><p>Usually no. The audit is the product. Most teams find their own engineers ship the fix list faster than I could, and they learn the codebase along the way. For unusual cases (a custom shader to be written, a <code>vector_math_64</code> rewrite of a gesture system), I do take implementation work, but only after the audit, and only if you ask.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     8. ABOUT
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section" id="about" aria-labelledby="about-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">07</span>&nbsp;The engineer</p>
+      <h2 id="about-h">The person opening your repo.</h2>
+    </header>
+
+    <div class="about js-reveal">
+      <figure class="portrait-frame">
+        <picture>
+          <source type="image/avif" srcset="/assets/portrait-320.avif 320w, /assets/portrait-480.avif 480w, /assets/portrait-640.avif 640w" sizes="(max-width: 720px) 70vw, 280px">
+          <source type="image/webp" srcset="/assets/portrait-320.webp 320w, /assets/portrait-480.webp 480w, /assets/portrait-640.webp 640w" sizes="(max-width: 720px) 70vw, 280px">
+          <img src="/assets/portrait-640.webp" alt="Nikita Kalaganov, senior Flutter engineer." width="320" height="400" loading="lazy" decoding="async">
+        </picture>
+        <figcaption class="portrait-caption">
+          <span>Nikita Kalaganov</span>
+          <span>One audit at a time</span>
+        </figcaption>
+      </figure>
+      <div class="about-body stack-lg">
+        <p>I am a senior Flutter engineer. I have spent the last several years building, debugging, and unsticking Flutter apps in production: scrolling that drops frames on flagship phones, custom animations that have to look correct on a Pixel 3a, gesture systems that hold up at 120 Hz on iPad Pro. I work in <code>vector_math_64</code>. I write shaders when the off-the-shelf paint will not render fast enough. I read frame timelines when I am stuck, which is often the fastest way out.</p>
+        <p><strong>What that means for you:</strong> when your app feels slow, I can usually say why inside a day. Rebuild storm, shader compile, expensive paint, main-thread work, image decode, layout thrash. The diagnosis is the hard part. The fix is usually small. The audit is me, your codebase, and the answer.</p>
+        <p>I take one audit at a time. That is the whole business. No agency, no team, no handoffs, no junior doing the work. If you hire the audit, you get me.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     9. BOOK — single form, sample-of-service offer
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section cta-section" id="book" aria-labelledby="book-h">
+  <div class="page">
+    <header class="section-head">
+      <p class="eyebrow"><span class="num">08</span>&nbsp;Book</p>
+      <h2 id="book-h">Send me your repo.</h2>
+      <p class="lede muted">Or describe the one thing hurting most. I read every form myself, usually within 24 hours.</p>
+    </header>
+
+    <form class="form" data-intake method="POST" action="https://formspree.io/f/REPLACE_ME">
+      <input class="honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+      <div class="form-row">
+        <label for="f-name">Name</label>
+        <input id="f-name" name="name" type="text" required autocomplete="name" placeholder="Alex Chen" minlength="2" maxlength="80">
+      </div>
+
+      <div class="form-row">
+        <label for="f-email">Work email</label>
+        <input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="alex@yourcompany.com" maxlength="120">
+        <p class="hint">I reply from a real address. No marketing list.</p>
+      </div>
+
+      <div class="form-row">
+        <label for="f-repo">Repo or app</label>
+        <input id="f-repo" name="repo" type="text" placeholder="github.com/yourcompany/your-app or a one-line description" maxlength="200">
+        <p class="hint">Public URL, private repo invite, or just tell me what platform stores you are on. We can sort access after the first reply.</p>
+      </div>
+
+      <div class="form-row">
+        <label for="f-symptom">What is hurting most right now?</label>
+        <textarea id="f-symptom" name="symptom" rows="4" placeholder="Scrolling is janky on Android. New devs take a month to onboard. Crashes are spiking after the last release. One symptom in your own words." maxlength="800"></textarea>
+        <p class="hint">One symptom is enough. The audit will find the rest.</p>
+      </div>
+
+      <input type="hidden" name="_subject" value="Audit intake from flutteraudit.dev">
+      <input type="hidden" name="_format" value="plain">
+
+      <button class="form-submit" type="submit">
+        Send
+        <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+      </button>
+
+      <p class="form-microcopy">
+        I read every form myself. You will hear from me within 24 hours, even if the answer is “I am not the right fit.” Your code, your email, and what you write here are not shared, sold, or used to train any model.
+      </p>
+
+      <noscript>
+        <p class="form-microcopy">If the form does not send, email me directly at <a href="mailto:hello@flutteraudit.dev?subject=Flutter%20audit%20intake">hello@flutteraudit.dev</a> with the same details.</p>
+      </noscript>
+    </form>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="page">
+    <div class="footer-grid">
+      <div class="footer-meta">
+        <p>nikita.audit · flutter audits · <span class="num">MMXXVI</span></p>
+        <p class="muted">Hand-coded. Zero trackers. <span class="num">~28 KB</span> initial transfer.</p>
+      </div>
+      <nav class="footer-links" aria-label="Elsewhere">
+        <a href="mailto:hello@flutteraudit.dev">Email</a>
+        <a rel="me" href="https://github.com/nikitakalaganov">GitHub</a>
+        <a rel="me" href="https://www.linkedin.com/in/nikitakalaganov/">LinkedIn</a>
+        <a rel="me" href="https://stackoverflow.com/users/me/nikita-kalaganov">Stack Overflow</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<!-- Sticky mobile-only bottom CTA — hidden when the form section is in view -->
+<div class="sticky-cta" data-sticky-cta aria-hidden="false">
+  <a class="cta" href="#book">
+    Send me your repo
+    <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
+  </a>
+</div>
+
+<style>
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.visually-hidden:focus-visible { position: fixed; top: 0; left: 0; width: auto; height: auto; padding: 0.5rem 1rem; background: var(--bg-elevated); color: var(--ink-strong); z-index: 100; border-radius: 0 0 var(--r-2) 0; clip: auto; box-shadow: var(--focus-ring); }
+</style>
+
+<!--%SCRIPT%-->
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* ============================================================
+   Layout — asymmetric editorial grid, container queries on
+   ============================================================ */
+
+.page {
+  --gutter: clamp(1.25rem, 3.5vw, 2rem);
+  width: 100%;
+  max-width: var(--w-page);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.narrow { max-width: var(--w-narrow); }
+.prose  { max-width: var(--w-prose); }
+
+.section {
+  position: relative;
+  padding-block: clamp(4rem, 9vw, 8rem);
+  contain: layout style;
+}
+
+.section + .section { border-top: 1px solid var(--hairline); }
+
+/* Section header with mono eyebrow + headline */
+.section-head {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-3);
+  margin-bottom: var(--s-7);
+  max-width: var(--w-narrow);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--type-label);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: var(--hairline-strong);
+}
+
+/* Asymmetric 12-col grid (used by hero + bento) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--s-5);
+}
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; gap: var(--s-5); }
+}
+
+.span-7  { grid-column: span 7; }
+.span-5  { grid-column: span 5; }
+.span-6  { grid-column: span 6; }
+.span-4  { grid-column: span 4; }
+.span-8  { grid-column: span 8; }
+.span-12 { grid-column: span 12; }
+
+@media (max-width: 880px) {
+  .span-7, .span-5, .span-6, .span-4, .span-8 { grid-column: 1 / -1; }
+}
+
+/* Bento — 3-up grid with a 2-col anchor */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--s-4);
+  container-type: inline-size;
+}
+
+.bento-card {
+  position: relative;
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-3);
+  padding: var(--s-6);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--s-3);
+  min-height: 220px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.bento-card.wide  { grid-column: span 4; }
+.bento-card.tall  { grid-column: span 2; }
+.bento-card.full  { grid-column: span 6; }
+
+@media (max-width: 880px) {
+  .bento { grid-template-columns: 1fr; }
+  .bento-card.wide, .bento-card.tall, .bento-card.full { grid-column: 1 / -1; }
+}
+
+/* Stack utility */
+.stack > * + * { margin-top: var(--s-4); }
+.stack-lg > * + * { margin-top: var(--s-6); }
+.stack-sm > * + * { margin-top: var(--s-2); }
+
+/* Cluster */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+}
+
+/* Hairline rule */
+.rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--hairline);
+  border: 0;
+}
+
+.rule-strong { background: var(--hairline-strong); }
+
+.rule-accent {
+  height: 1px;
+  background: var(--accent);
+  width: 140px;
+}
