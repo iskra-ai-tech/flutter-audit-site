@@ -1,17 +1,9 @@
 /* ============================================================
-   animations.css — all reveal motion is JS-driven (motion.js v3).
-   This file only defines:
-     · the scroll-progress bar baseline (JS scales it)
-     · the .lw line-wipe wrapper (used by JS line-wipes)
-     · the nav-reveal transitions
-     · prefers-reduced-motion → static-visible final state
-   No CSS @supports (animation-timeline: view()) is used —
-   that API had inconsistent behavior across Safari/Chrome
-   making the page appear blank to users. JS WAAPI is the
-   single source of truth now.
+   animations.css — primitives only. All section reveals live
+   in reveals.css. Hero entrance is class-toggled by motion.js.
    ============================================================ */
 
-/* Line-wipe wrapper primitive (overflow-clip parent for translateY children) */
+/* Line-wipe wrapper primitive (overflow-clip parent for translateY inner) */
 .lw {
   display: inline-block;
   overflow: hidden;
@@ -20,7 +12,7 @@
 }
 .lw > * { display: inline-block; }
 
-/* Scroll-progress bar — JS animates transform: scaleX(0 → 1) */
+/* Scroll-progress bar — JS sets transform: scaleX(N) per frame */
 .scroll-progress {
   position: fixed;
   inset: 0 0 auto 0;
@@ -33,23 +25,16 @@
   will-change: transform;
 }
 
-/* Nav reveal-on-upscroll (orchestrated from motion.js) */
-.nav[data-revealed="false"] { transform: translateY(-100%); transition: transform var(--d-mid) var(--ease-emphasized); }
-.nav[data-revealed="true"]  { transform: translateY(0); transition: transform var(--d-mid) var(--ease-emphasized); }
-
-/* Fallback IO-driven reveal class — JS adds .is-in when it runs */
-.js-reveal {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity var(--d-mid) var(--ease-emphasized),
-              transform var(--d-mid) var(--ease-emphasized);
-  will-change: transform, opacity;
+/* Nav reveal-on-upscroll */
+.nav[data-revealed="false"] {
+  transform: translateY(-100%);
+  transition: transform var(--d-mid) var(--ease-emphasized);
 }
-.js-reveal.is-in { opacity: 1; transform: none; }
+.nav[data-revealed="true"] {
+  transform: translateY(0);
+  transition: transform var(--d-mid) var(--ease-emphasized);
+}
 
-/* Reduced-motion path — kill the scroll-progress entirely and let JS
-   provide static-visible state on every other element. */
 @media (prefers-reduced-motion: reduce) {
   .scroll-progress { display: none !important; }
-  .js-reveal { opacity: 1; transform: none; transition: none; }
 }

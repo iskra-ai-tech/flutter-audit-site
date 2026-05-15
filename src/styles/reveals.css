@@ -1,0 +1,315 @@
+/* ============================================================
+   reveals.css — Pattern A reveals.
+   Initial hidden states apply ONLY when JS is running
+   (html.js-motion). No-JS users see the final state.
+   Final state IS the element's natural CSS — no inline-style
+   mutation, no layout jump after the animation completes.
+   ============================================================ */
+
+/* ─── Hero entrance primitives ─────────────────────────────── */
+html.js-motion .hero-hairline,
+html.js-motion .hero-eyebrow-text,
+html.js-motion .hero-byline,
+html.js-motion .hero-headline .line-inner,
+html.js-motion .hero-rule,
+html.js-motion .hero-lede,
+html.js-motion .hero-ctas,
+html.js-motion .hero-trust,
+html.js-motion .hero-caret {
+  opacity: 0;
+  will-change: transform, opacity;
+  transition:
+    opacity   800ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    transform 800ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+html.js-motion .hero-hairline    { transform: scaleX(0); transform-origin: left center; }
+html.js-motion .hero-eyebrow-text { transform: translateY(6px); }
+html.js-motion .hero-byline      { transform: translateY(16px); }
+html.js-motion .hero-headline .line-inner { transform: translateY(110%); opacity: 1; }
+html.js-motion .hero-rule        { transform: scaleX(0); transform-origin: left center; }
+html.js-motion .hero-lede        { transform: translateY(20px); }
+html.js-motion .hero-ctas        { transform: translateY(20px); }
+html.js-motion .hero-trust       { transform: translateY(20px); }
+html.js-motion .hero-caret       { transform: scaleY(0.5); transform-origin: bottom center; }
+
+.hero-hairline.is-in,
+.hero-eyebrow-text.is-in,
+.hero-byline.is-in,
+.hero-headline .line-inner.is-in,
+.hero-rule.is-in,
+.hero-lede.is-in,
+.hero-ctas.is-in,
+.hero-trust.is-in,
+.hero-caret.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-hairline.is-in { transform: scaleX(1); }
+.hero-rule.is-in     { transform: scaleX(1); }
+.hero-caret.is-in    { transform: scaleY(1); }
+
+/* Line 3 of the hero headline rolls in on a spring */
+html.js-motion .hero-headline .line:nth-child(3) .line-inner {
+  transition: transform 900ms linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.55 10.6%, 0.717 13.6%, 0.864 17%, 1.005 20.1%, 1.063 22.3%, 1.094, 1.114, 1.123, 1.123, 1.117, 1.107 33.7%, 1.084 37.5%, 1.027 47%, 1.005 53%, 0.989 60%, 0.984 71%, 0.998 100%);
+}
+
+/* ─── Section-head sub-stagger (eyebrow + h2 + lede) ────────── */
+/* IO observes [data-reveal]; when .section-head gets .is-in,
+   children fire via transition-delay tied to a CSS chain. */
+html.js-motion .section-head .eyebrow {
+  opacity: 0;
+  /* DO NOT animate letter-spacing — it changes intrinsic width on the
+     inline-flex container and causes "04" / "How it runs" to wrap. */
+  transform: translateY(8px);
+  transition:
+    opacity   700ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 700ms cubic-bezier(0.25, 1, 0.5, 1);
+  transition-delay: 0ms;
+}
+html.js-motion .section-head h2 {
+  opacity: 0;
+  transform: translateY(34px);
+  /* No clip-path on the H2 — interferes with text-wrap and creates
+     a containing-block shift when transform is released. */
+  transition:
+    opacity   900ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    transform 900ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: 120ms;
+}
+html.js-motion .section-head .lede {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity   700ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    transform 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: 260ms;
+}
+.section-head.is-in .eyebrow,
+.section-head.is-in h2,
+.section-head.is-in .lede {
+  opacity: 1;
+  transform: none;
+}
+
+/* ─── Problem cards — 3-up with stagger + inner sub-reveal ── */
+html.js-motion .problem-card {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity   850ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    transform 850ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+.problem-card.is-in { opacity: 1; transform: none; }
+
+html.js-motion .problem-card .num,
+html.js-motion .problem-card h3,
+html.js-motion .problem-card p:not(.num) {
+  opacity: 0;
+  transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+html.js-motion .problem-card .num {
+  transform: scale(0.9);
+  transition: opacity 500ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 500ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.problem-card.is-in .num         { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 110ms + 200ms); }
+.problem-card.is-in h3           { opacity: 1; transition-delay: calc(var(--i, 0) * 110ms + 350ms); }
+.problem-card.is-in p:not(.num)  { opacity: 1; transition-delay: calc(var(--i, 0) * 110ms + 500ms); }
+
+/* ─── Bento cards — 5-layer ────────────────────────────────── */
+html.js-motion .bento-card {
+  opacity: 0;
+  transform: translateY(36px);
+  transition:
+    opacity   900ms cubic-bezier(0.05, 0.7, 0.1, 1),
+    transform 900ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 130ms);
+}
+.bento-card.is-in { opacity: 1; transform: none; }
+
+html.js-motion .bento-card .bento-num,
+html.js-motion .bento-card h3,
+html.js-motion .bento-card p:not(.bento-num):not(.bento-card-edge),
+html.js-motion .bento-card .bento-card-edge {
+  opacity: 0;
+  transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+html.js-motion .bento-card .bento-num { transform: translateY(8px); }
+html.js-motion .bento-card h3 { transform: translateY(6px); }
+
+.bento-card.is-in .bento-num                                       { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 130ms + 250ms); }
+.bento-card.is-in h3                                               { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 130ms + 400ms); }
+.bento-card.is-in p:not(.bento-num):not(.bento-card-edge)          { opacity: 1; transition-delay: calc(var(--i, 0) * 130ms + 550ms); }
+.bento-card.is-in .bento-card-edge                                 { opacity: 1; transition-delay: calc(var(--i, 0) * 130ms + 700ms); }
+
+/* ─── Checklist 12 items — weaving stagger ─────────────────── */
+html.js-motion .checklist > li {
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+html.js-motion .checklist > li:nth-child(odd)  { transform: translate(-10px, 18px); }
+html.js-motion .checklist > li:nth-child(even) { transform: translate( 10px, 18px); }
+.checklist > li.is-in { opacity: 1; transform: none; }
+
+html.js-motion .checklist > li .cl-num,
+html.js-motion .checklist > li h3,
+html.js-motion .checklist > li p {
+  opacity: 0;
+  transition: opacity 500ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+html.js-motion .checklist > li .cl-num { transform: translateY(14px) rotate(-6deg); }
+
+.checklist > li.is-in .cl-num { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 70ms + 200ms); }
+.checklist > li.is-in h3      { opacity: 1; transition-delay: calc(var(--i, 0) * 70ms + 350ms); }
+.checklist > li.is-in p       { opacity: 1; transition-delay: calc(var(--i, 0) * 70ms + 450ms); }
+
+/* ─── Philosophy paragraphs ────────────────────────────────── */
+html.js-motion .philosophy p {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1000ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 1000ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+.philosophy.is-in p { opacity: 1; transform: none; }
+.philosophy.is-in p:nth-child(2) { transition-delay: 180ms; }
+
+/* ─── Process steps ────────────────────────────────────────── */
+html.js-motion .process-step {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 850ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 850ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 140ms);
+}
+.process-step.is-in { opacity: 1; transform: none; }
+
+html.js-motion .process-step .process-day {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 600ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.process-step.is-in .process-day { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 140ms + 150ms); }
+
+/* ─── Pricing ──────────────────────────────────────────────── */
+html.js-motion .pricing {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 950ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 950ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+.pricing.is-in { opacity: 1; transform: none; }
+
+/* ─── FAQ items ────────────────────────────────────────────── */
+html.js-motion .faq-item {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 700ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+.faq-item.is-in { opacity: 1; transform: none; }
+
+/* ─── About — portrait + body ──────────────────────────────── */
+html.js-motion .portrait-frame {
+  opacity: 0.4;
+  transform: scale(1.04);
+  filter: blur(8px);
+  transition: opacity 1400ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 1400ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              filter    1400ms cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+.portrait-frame.is-in { opacity: 1; transform: none; filter: none; }
+
+html.js-motion .about-body {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 900ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 900ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: 250ms;
+}
+.about-body.is-in { opacity: 1; transform: none; }
+
+/* ─── Form rows ────────────────────────────────────────────── */
+html.js-motion .form-row {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms cubic-bezier(0.05, 0.7, 0.1, 1),
+              transform 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition-delay: calc(var(--i, 0) * 100ms);
+}
+.form-row.is-in { opacity: 1; transform: none; }
+
+/* ─── Runtime-injected accent spans (hero shimmer, pricing rule) ─ */
+.hero-rule { position: relative; overflow: hidden; }
+.hero-rule .hero-rule-shimmer {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, oklch(0.97 0.06 85 / 0.95) 50%, transparent 100%);
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+.hero-headline { position: relative; }
+.hero-headline .hero-h1-shimmer {
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 38%, oklch(0.97 0 0 / 0.22) 50%, transparent 62%);
+  pointer-events: none;
+  transform: translateX(-30%);
+  mix-blend-mode: screen;
+}
+.pricing-anchor { position: relative; }
+.pricing-commit-rule {
+  position: absolute; left: 0; right: 0; bottom: -0.5rem;
+  height: 1px; background: var(--accent);
+  transform: scaleX(0); transform-origin: left center;
+  pointer-events: none;
+}
+
+/* ─── Reduced-motion: keep everything visible immediately ───── */
+@media (prefers-reduced-motion: reduce) {
+  html.js-motion .hero-hairline,
+  html.js-motion .hero-eyebrow-text,
+  html.js-motion .hero-byline,
+  html.js-motion .hero-headline .line-inner,
+  html.js-motion .hero-rule,
+  html.js-motion .hero-lede,
+  html.js-motion .hero-ctas,
+  html.js-motion .hero-trust,
+  html.js-motion .hero-caret,
+  html.js-motion [data-reveal],
+  html.js-motion .section-head .eyebrow,
+  html.js-motion .section-head h2,
+  html.js-motion .section-head .lede,
+  html.js-motion .problem-card,
+  html.js-motion .problem-card .num,
+  html.js-motion .problem-card h3,
+  html.js-motion .problem-card p,
+  html.js-motion .bento-card,
+  html.js-motion .bento-card .bento-num,
+  html.js-motion .bento-card h3,
+  html.js-motion .bento-card p,
+  html.js-motion .bento-card .bento-card-edge,
+  html.js-motion .checklist > li,
+  html.js-motion .checklist > li .cl-num,
+  html.js-motion .checklist > li h3,
+  html.js-motion .checklist > li p,
+  html.js-motion .philosophy p,
+  html.js-motion .process-step,
+  html.js-motion .process-step .process-day,
+  html.js-motion .pricing,
+  html.js-motion .faq-item,
+  html.js-motion .portrait-frame,
+  html.js-motion .about-body,
+  html.js-motion .form-row {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}

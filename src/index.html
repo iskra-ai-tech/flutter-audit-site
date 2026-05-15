@@ -18,7 +18,7 @@
 <meta property="og:image" content="{{site.origin}}{{site.ogImage}}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Flutter App Audit — Senior engineer, fixed price, 5 days.">
+<meta property="og:image:alt" content="Flutter App Audit — Senior engineer, fixed price, 3 days.">
 <meta property="og:url" content="{{site.origin}}/">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -107,16 +107,16 @@
         "@type": "BusinessAudience",
         "audienceType": "Founders, CTOs, heads of engineering operating production Flutter apps"
       },
-      "description": "Five-day fixed-price audit of a Flutter app. Ranked fix list, frame-by-frame performance report, two-page brief, 60-minute walkthrough call.",
+      "description": "Three-day $500 audit of a Flutter app. Ranked fix list, frame-by-frame performance report, two-page brief, 60-minute walkthrough call.",
       "offers": {
         "@type": "Offer",
-        "price": "4800",
+        "price": "500",
         "priceCurrency": "USD",
         "priceSpecification": {
           "@type": "PriceSpecification",
-          "minPrice": "4800",
+          "price": "500",
           "priceCurrency": "USD",
-          "description": "Typical 5-day audit; the quote firms after intake."
+          "description": "Fixed-price 3-day audit. Diagnostic + report + walkthrough."
         },
         "availability": "https://schema.org/InStock"
       }
@@ -145,11 +145,11 @@
       "@type": "FAQPage",
       "@id": "{{site.origin}}/#faq",
       "mainEntity": [
-        { "@type": "Question", "name": "Why an audit instead of just hiring a senior Flutter engineer?", "acceptedAnswer": { "@type": "Answer", "text": "Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question." } },
+        { "@type": "Question", "name": "Why an audit instead of just hiring a senior Flutter engineer?", "acceptedAnswer": { "@type": "Answer", "text": "Hiring takes three to four months and a salary. The audit takes three days and $500. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question." } },
         { "@type": "Question", "name": "Do you need the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The audit is me reading your code. Walkthroughs, screen-shares, or descriptions are not a substitute. NDA before code changes hands, but the source itself is non-negotiable." } },
         { "@type": "Question", "name": "Our app is not slow, it is just messy. Is the audit still useful?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, possibly more so. Performance audits get the headlines, architectural audits change quarters." } },
         { "@type": "Question", "name": "How is this different from running flutter analyze or a code-quality SaaS?", "acceptedAnswer": { "@type": "Answer", "text": "flutter analyze tells you what is syntactically wrong. The audit tells you what is strategically wrong. A linter sees code. The audit sees decisions." } },
-        { "@type": "Question", "name": "What if you find the problem is too big for a 5-day audit?", "acceptedAnswer": { "@type": "Answer", "text": "I tell you on Day 2, refund the unused portion, and write up what I have found so far in whatever shape is useful to you." } },
+        { "@type": "Question", "name": "What if you find the problem is too big for a 3-day audit?", "acceptedAnswer": { "@type": "Answer", "text": "I tell you on Day 2, refund the unused portion, and write up what I have found so far in whatever shape is useful to you." } },
         { "@type": "Question", "name": "Do you do the fixes too?", "acceptedAnswer": { "@type": "Answer", "text": "Usually no. The audit is the product. For unusual cases I take implementation work, but only after the audit, and only if you ask." } }
       ]
     }
@@ -206,7 +206,7 @@
     <hr class="hero-rule">
 
     <p class="hero-lede" id="hero-lede">
-      Five days. One senior engineer. A ranked fix list, a frame timeline, and a walkthrough. Fixed price, quoted after I see the repo.
+      A 3-day diagnostic by a senior Flutter engineer. $500 flat. Ranked fix list, frame timeline, 60-minute walkthrough. The starting move &mdash; not the whole engagement.
     </p>
 
     <div class="hero-ctas">
@@ -228,23 +228,23 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="problem" aria-labelledby="problem-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">01</span>&nbsp;Symptoms</p>
       <h2 id="problem-h"><span class="lw">Three sentences you have already said this quarter.</span></h2>
     </header>
 
-    <div class="problem-grid js-stagger">
-      <article class="problem-card js-reveal">
+    <div class="problem-grid">
+      <article class="problem-card" data-reveal data-reveal-group="problem">
         <p class="num">01</p>
         <h3>The app got slower and nobody knows when.</h3>
         <p>The first run after install has a frame storm. The home tab scrolls like it is underwater on mid-tier Android. A reviewer wrote “feels laggy” last month and you closed the tab. Your team noticed. You noticed. No one has said it out loud in standup.</p>
       </article>
-      <article class="problem-card js-reveal">
+      <article class="problem-card" data-reveal data-reveal-group="problem">
         <p class="num">02</p>
         <h3>Adding one feature touches eight files.</h3>
         <p>State lives in three libraries because three engineers each had a favourite. A custom animation in <code>home_screen.dart</code> is untouchable. Tracing a bug is five directories and a Slack thread from 2024. Velocity has half of what it had a year ago.</p>
       </article>
-      <article class="problem-card js-reveal">
+      <article class="problem-card" data-reveal data-reveal-group="problem">
         <p class="num">03</p>
         <h3>Onboarding the new senior takes a month.</h3>
         <p>They are good. They are senior. They still spend three weeks in the codebase before they ship anything, because no one wrote down which 200 lines actually decide the app. The thing inside the codebase that should be obvious is not.</p>
@@ -258,38 +258,38 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="deliverables" aria-labelledby="deliv-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">02</span>&nbsp;Deliverables</p>
       <h2 id="deliv-h"><span class="lw">A short list, a real report, and an hour with your team.</span></h2>
       <p class="lede muted">The audit is one product. Not a retainer, not a sales call. You get five things and you keep them.</p>
     </header>
 
-    <div class="bento js-stagger">
-      <article class="bento-card wide js-reveal">
+    <div class="bento">
+      <article class="bento-card wide" data-reveal data-reveal-group="bento">
         <p class="bento-num">D01</p>
         <h3>A ranked fix list short enough to ship this sprint.</h3>
         <p>Five to ten items, ordered by impact and effort, with the file and line where to start. Not a backlog. The audit ends with a sprint, not a wishlist.</p>
         <p class="bento-card-edge"><span>OUTPUT</span><span>Markdown · 1–2 pages</span></p>
       </article>
-      <article class="bento-card tall js-reveal">
+      <article class="bento-card tall" data-reveal data-reveal-group="bento">
         <p class="bento-num">D02</p>
         <h3>Frame-by-frame perf report.</h3>
         <p>Before/after timings for your three worst screens, captured on real devices. The bottleneck is named.</p>
         <p class="bento-card-edge"><span>OUTPUT</span><span>HTML + screenshots</span></p>
       </article>
-      <article class="bento-card tall js-reveal">
+      <article class="bento-card tall" data-reveal data-reveal-group="bento">
         <p class="bento-num">D03</p>
         <h3>A plain-English brief.</h3>
         <p>Two pages your CFO can read. Risk, cost, fix. Send up the chain without translating.</p>
         <p class="bento-card-edge"><span>OUTPUT</span><span>PDF · 2 pages</span></p>
       </article>
-      <article class="bento-card wide js-reveal">
+      <article class="bento-card wide" data-reveal data-reveal-group="bento">
         <p class="bento-num">D04</p>
         <h3>A 60-minute walkthrough with your team.</h3>
         <p>Engineers shipping the code in the room, real-time questions, recorded. The team leaves knowing what to do Monday morning.</p>
         <p class="bento-card-edge"><span>OUTPUT</span><span>Recorded call · 1 hr</span></p>
       </article>
-      <article class="bento-card full js-reveal">
+      <article class="bento-card full" data-reveal data-reveal-group="bento">
         <p class="bento-num">D05</p>
         <h3>A roadmap that survives me leaving.</h3>
         <p>Notes, diagrams, naming conventions, and the three architectural decisions I would make next. The audit pays off long after I am out of your Slack.</p>
@@ -310,25 +310,25 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="checklist" aria-labelledby="cl-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">02b</span>&nbsp;Free · Read on the page</p>
       <h2 id="cl-h"><span class="lw">The 12-point Flutter performance checklist.</span></h2>
       <p class="lede muted">The exact warm-pass I run against every codebase on Day 1, before I touch DevTools. Public on purpose. If your team can clear all twelve, you probably do not need me.</p>
     </header>
 
     <ol class="checklist">
-      <li><div class="cl-num">01</div><div><h3>Const constructors everywhere they belong.</h3><p>Every widget that does not depend on dynamic state should be <code>const</code>. Non-const subtrees rebuild on every parent <code>setState</code>; const subtrees skip the diff entirely. <em>Grep:</em> <code>final\s+\w+\s*=\s*Widget</code> without <code>const</code>.</p></div></li>
-      <li><div class="cl-num">02</div><div><h3>RepaintBoundary around every animated subtree.</h3><p>Animating children without a <code>RepaintBoundary</code> repaints the parent layer on every frame. Free 30–40% paint cost on animated screens. <em>Check:</em> the Flutter DevTools <em>Performance Overlay</em> red bars.</p></div></li>
-      <li><div class="cl-num">03</div><div><h3>Shader warm-up on first frame.</h3><p>First-run jank is almost always shader compilation. Pre-compile with <code>--cache-sksl-path</code> on iOS, ship the warm cache, or pre-paint signature widgets on a hidden frame. <em>Symptom:</em> the first scroll is jankier than the second.</p></div></li>
-      <li><div class="cl-num">04</div><div><h3>Lists ship via <code>builder</code> or slivers.</h3><p>Eager <code>ListView(children: [ … ])</code> mounts every child on first frame. Above ~12 items you are paying for content that has never been on screen. <em>Fix:</em> always <code>ListView.builder</code> or a <code>CustomScrollView</code> of slivers.</p></div></li>
-      <li><div class="cl-num">05</div><div><h3>Images decode at display size, not source size.</h3><p>A 2000×2000 hero rendered at 200×200 still decodes 16 MB of pixels on the main thread. <em>Fix:</em> <code>cacheWidth</code>/<code>cacheHeight</code> on <code>Image</code>, <code>ResizeImage</code>, and <code>precacheImage</code> for known-soon assets.</p></div></li>
-      <li><div class="cl-num">06</div><div><h3>No side effects inside <code>build()</code>.</h3><p>No <code>setState</code>, no provider notifications, no async kick-offs. <code>build</code> runs unpredictably often; side effects there are the source of half of the rebuild storms I find.</p></div></li>
-      <li><div class="cl-num">07</div><div><h3>State scope is the smallest leaf, not the whole screen.</h3><p>A <code>setState</code> in <code>HomeScreenState</code> rebuilds the entire home screen. <em>Fix:</em> <code>ValueListenableBuilder</code>, <code>Selector</code> on a Provider, or a small inner <code>StatefulBuilder</code>.</p></div></li>
-      <li><div class="cl-num">08</div><div><h3>Providers and notifiers do not over-broadcast.</h3><p>Top-level <code>ChangeNotifier</code> with <code>notifyListeners()</code> in a hot path rebuilds every listener in the tree. <em>Fix:</em> split state, use <code>Selector</code>, or replace with a Riverpod <code>StateNotifier</code> with narrower outputs.</p></div></li>
-      <li><div class="cl-num">09</div><div><h3>Animation controllers are disposed.</h3><p>Every <code>AnimationController</code> needs a matching <code>dispose</code>. Leaked tickers keep firing for the life of the app — invisible to the user, lethal to long sessions on mid-tier Android.</p></div></li>
-      <li><div class="cl-num">10</div><div><h3><code>CustomPainter.shouldRepaint</code> says <em>no</em> by default.</h3><p>The default is <em>repaint always</em>. Override <code>shouldRepaint</code> to return <code>false</code> when nothing relevant changed. Free win on any signature paint.</p></div></li>
-      <li><div class="cl-num">11</div><div><h3>No async bursts in <code>initState</code>.</h3><p>Multiple awaited futures in <code>initState</code> stall the first frame. <em>Fix:</em> kick them off without awaiting, render a skeleton, fill in as data arrives. The first frame is the impression.</p></div></li>
-      <li><div class="cl-num">12</div><div><h3>Build graph depth under ~20 in hot paths.</h3><p>Every layer is a <code>Element</code> diff per rebuild. A 35-deep widget tree in a list item is the silent tax that turns a 60 FPS screen into a 38 FPS one. <em>Fix:</em> hoist subtrees behind <code>const</code> or extract them to siblings.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">01</div><div><h3>Const constructors everywhere they belong.</h3><p>Every widget that does not depend on dynamic state should be <code>const</code>. Non-const subtrees rebuild on every parent <code>setState</code>; const subtrees skip the diff entirely. <em>Grep:</em> <code>final\s+\w+\s*=\s*Widget</code> without <code>const</code>.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">02</div><div><h3>RepaintBoundary around every animated subtree.</h3><p>Animating children without a <code>RepaintBoundary</code> repaints the parent layer on every frame. Free 30–40% paint cost on animated screens. <em>Check:</em> the Flutter DevTools <em>Performance Overlay</em> red bars.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">03</div><div><h3>Shader warm-up on first frame.</h3><p>First-run jank is almost always shader compilation. Pre-compile with <code>--cache-sksl-path</code> on iOS, ship the warm cache, or pre-paint signature widgets on a hidden frame. <em>Symptom:</em> the first scroll is jankier than the second.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">04</div><div><h3>Lists ship via <code>builder</code> or slivers.</h3><p>Eager <code>ListView(children: [ … ])</code> mounts every child on first frame. Above ~12 items you are paying for content that has never been on screen. <em>Fix:</em> always <code>ListView.builder</code> or a <code>CustomScrollView</code> of slivers.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">05</div><div><h3>Images decode at display size, not source size.</h3><p>A 2000×2000 hero rendered at 200×200 still decodes 16 MB of pixels on the main thread. <em>Fix:</em> <code>cacheWidth</code>/<code>cacheHeight</code> on <code>Image</code>, <code>ResizeImage</code>, and <code>precacheImage</code> for known-soon assets.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">06</div><div><h3>No side effects inside <code>build()</code>.</h3><p>No <code>setState</code>, no provider notifications, no async kick-offs. <code>build</code> runs unpredictably often; side effects there are the source of half of the rebuild storms I find.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">07</div><div><h3>State scope is the smallest leaf, not the whole screen.</h3><p>A <code>setState</code> in <code>HomeScreenState</code> rebuilds the entire home screen. <em>Fix:</em> <code>ValueListenableBuilder</code>, <code>Selector</code> on a Provider, or a small inner <code>StatefulBuilder</code>.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">08</div><div><h3>Providers and notifiers do not over-broadcast.</h3><p>Top-level <code>ChangeNotifier</code> with <code>notifyListeners()</code> in a hot path rebuilds every listener in the tree. <em>Fix:</em> split state, use <code>Selector</code>, or replace with a Riverpod <code>StateNotifier</code> with narrower outputs.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">09</div><div><h3>Animation controllers are disposed.</h3><p>Every <code>AnimationController</code> needs a matching <code>dispose</code>. Leaked tickers keep firing for the life of the app — invisible to the user, lethal to long sessions on mid-tier Android.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">10</div><div><h3><code>CustomPainter.shouldRepaint</code> says <em>no</em> by default.</h3><p>The default is <em>repaint always</em>. Override <code>shouldRepaint</code> to return <code>false</code> when nothing relevant changed. Free win on any signature paint.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">11</div><div><h3>No async bursts in <code>initState</code>.</h3><p>Multiple awaited futures in <code>initState</code> stall the first frame. <em>Fix:</em> kick them off without awaiting, render a skeleton, fill in as data arrives. The first frame is the impression.</p></div></li>
+      <li data-reveal data-reveal-group="checklist"><div class="cl-num">12</div><div><h3>Build graph depth under ~20 in hot paths.</h3><p>Every layer is a <code>Element</code> diff per rebuild. A 35-deep widget tree in a list item is the silent tax that turns a 60 FPS screen into a 38 FPS one. <em>Fix:</em> hoist subtrees behind <code>const</code> or extract them to siblings.</p></div></li>
     </ol>
 
     <p class="checklist-foot meta">If two or more of these are violated in your codebase, the audit usually pays for itself in the first PR you do not have to write.</p>
@@ -340,14 +340,14 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="philosophy" aria-labelledby="phil-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">03</span>&nbsp;How I read code</p>
       <h2 id="phil-h"><span class="lw">A code audit is not a code review.</span></h2>
     </header>
 
-    <div class="philosophy js-reveal">
+    <div class="philosophy" data-reveal>
       <p>A code review tells you what is syntactically wrong. An audit tells you what is strategically wrong. Which decision from 2023 is costing a week per release. Which custom animation will bite you on the next Flutter version. Which third of your providers can be deleted.</p>
-      <p>A linter sees code; the audit sees decisions. Five days is enough because the diagnosis is the hard part. The fix list is short on purpose. Most of the value is what is no longer there.</p>
+      <p>A linter sees code; the audit sees decisions. Three days is enough because the diagnosis is the hard part. The fix list is short on purpose. Most of the value is what is no longer there.</p>
     </div>
   </div>
 </section>
@@ -357,39 +357,39 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="process" aria-labelledby="proc-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">04</span>&nbsp;How it runs</p>
-      <h2 id="proc-h"><span class="lw">Five days. Same shape every time.</span></h2>
+      <h2 id="proc-h"><span class="lw">Three days. Same shape every time.</span></h2>
     </header>
 
     <div class="process">
       <div class="process-rail" aria-hidden="true"></div>
-      <div class="process-step js-reveal">
+      <div class="process-step" data-reveal data-reveal-group="process">
         <div class="process-day">DAY 0</div>
         <div>
           <h3>You send the repo.</h3>
           <p>GitHub, GitLab, Bitbucket, or a zip. One symptom in your own words. NDA before code changes hands. I reply within 24 hours either confirming we are a fit or telling you exactly why we are not.</p>
         </div>
       </div>
-      <div class="process-step js-reveal">
-        <div class="process-day">DAYS 1–3</div>
+      <div class="process-step" data-reveal data-reveal-group="process">
+        <div class="process-day">DAY 1</div>
         <div>
-          <h3>Inside the code.</h3>
-          <p>Day 1 is reading. Days 2 and 3 are profiling on real devices: frame timelines, memory, GPU, build graph, dependency map. I ping you with questions and do not disappear.</p>
+          <h3>Reading.</h3>
+          <p>I read the repo end to end. State, navigation, render paths, the three architectural decisions that drive everything else. Notes you can use even before the report lands.</p>
         </div>
       </div>
-      <div class="process-step js-reveal">
-        <div class="process-day">DAY 4</div>
+      <div class="process-step" data-reveal data-reveal-group="process">
+        <div class="process-day">DAY 2</div>
         <div>
-          <h3>The report.</h3>
-          <p>The fix list, the perf report, the two-page brief, the roadmap notes. Delivered the morning of Day 5.</p>
+          <h3>Profiling on real devices.</h3>
+          <p>Frame timelines, memory, GPU, build graph, dependency map. The bottleneck is named: rebuild storm, shader compile, expensive paint, main-thread work, image decode, layout thrash. Whichever it actually is.</p>
         </div>
       </div>
-      <div class="process-step js-reveal">
-        <div class="process-day">DAY 5</div>
+      <div class="process-step" data-reveal data-reveal-group="process">
+        <div class="process-day">DAY 3</div>
         <div>
-          <h3>The walkthrough.</h3>
-          <p>One hour, your engineers in the room, screen-share through the findings. Every question answered. Recorded for whoever could not make it. Two weeks of async clarifications + PR review after.</p>
+          <h3>Report + walkthrough.</h3>
+          <p>The fix list, the perf report, the two-page brief, the roadmap notes. Then a 60-minute walkthrough with your engineers, screen-share, real-time questions, recorded. Two weeks of async clarifications + PR review after.</p>
         </div>
       </div>
     </div>
@@ -401,29 +401,32 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="pricing" aria-labelledby="price-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">05</span>&nbsp;Price</p>
       <h2 id="price-h"><span class="lw">One price. Quoted after I see the repo.</span></h2>
     </header>
 
-    <div class="pricing js-reveal">
+    <div class="pricing" data-reveal>
       <div class="pricing-anchor">
         <span class="pricing-amount">
-          <span class="num pricing-count" data-pricing-count="4800" aria-label="$4,800">$<span class="pricing-count-digits">4,800</span></span>
-          <span class="pricing-amount-unit">USD · from</span>
+          <span class="num pricing-count" data-pricing-count="500" aria-label="$500">$<span class="pricing-count-digits">500</span></span>
+          <span class="pricing-amount-unit">USD · flat</span>
         </span>
       </div>
-      <p class="pricing-note">Typical 5-day audit; the quote firms after the intake call.</p>
+      <p class="pricing-note">A 3-day diagnostic, not a full engagement. Senior day-rate elsewhere is $1,200&ndash;$2,400. This is intentionally lower friction &mdash; a real audit, scoped tight, designed as the first move.</p>
 
       <ul class="pricing-list">
-        <li>Five working days inside your codebase</li>
-        <li>Full deliverable set: fix list, perf report, brief, walkthrough</li>
+        <li>Three working days inside your codebase</li>
+        <li>Ranked fix list (5&ndash;10 items, file + line, impact + effort)</li>
+        <li>Frame-by-frame perf report on your three worst screens</li>
+        <li>Two-page plain-English brief for non-engineering stakeholders</li>
+        <li>60-minute walkthrough with your team, recorded</li>
         <li>Two weeks of async follow-up + PR review</li>
         <li>NDA on request, before code changes hands</li>
       </ul>
 
       <p class="pricing-reassurance">
-        The price is fixed when I quote it. If the work takes me longer than I scoped, you pay what we agreed and nothing more. If by Day 2 I find the audit cannot deliver what I quoted for, I tell you, refund the unspent half, and send everything I have so far in whatever shape is useful.
+        Fixed at $500, paid on completion. If by Day 2 I find the audit cannot deliver a useful answer in 3 days, I refund in full and send everything I have so far. About half of the audits I run lead to a deeper engagement after &mdash; if you continue with me, the $500 credits forward.
       </p>
     </div>
   </div>
@@ -434,33 +437,37 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="faq" aria-labelledby="faq-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">06</span>&nbsp;Questions</p>
       <h2 id="faq-h"><span class="lw">Six questions, six answers.</span></h2>
     </header>
 
     <div class="faq">
-      <details class="faq-item js-reveal" open>
+      <details class="faq-item" data-reveal data-reveal-group="faq" open>
         <summary>Why an audit instead of just hiring a senior Flutter engineer?</summary>
-        <div><p>Hiring takes three to four months and a salary. The audit takes five days and a fee. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question. The audit is the cheapest way to find out what hiring will not fix.</p></div>
+        <div><p>Hiring takes three to four months and a salary. The audit takes three days and $500. If after the audit you decide you do need to hire, you will know exactly what skills the hire needs, which is usually the harder question. The audit is the cheapest way to find out what hiring will not fix.</p></div>
       </details>
-      <details class="faq-item js-reveal">
+      <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Do you need the source code?</summary>
         <div><p>Yes. The audit is me reading your code. Walkthroughs, screen-shares, recordings, or descriptions are not a substitute — I need the repo. NDA before code changes hands, no problem. If the source cannot be shared, the audit is not a fit.</p></div>
       </details>
-      <details class="faq-item js-reveal">
+      <details class="faq-item" data-reveal data-reveal-group="faq">
+        <summary>Why $500 — is it a real audit at that price?</summary>
+        <div><p>Yes. It is intentionally priced as a low-friction first engagement. You get a senior engineer for three days, a real report, and a walkthrough — the same shape as a $5,000 audit, scoped tighter. If the work runs over, that is my problem, not yours. About half the audits I run lead to a deeper engagement after; most do not, and that is fine. The $500 is the deliverable, not a foot in the door.</p></div>
+      </details>
+      <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Our app is not slow. It is just messy. Is the audit still useful?</summary>
         <div><p>Yes, possibly more so. Performance audits get the headlines, architectural audits change quarters. If your team is touching eight files for a one-field change, you do not have a performance problem, you have a velocity problem. Same audit, different fix-list categories.</p></div>
       </details>
-      <details class="faq-item js-reveal">
+      <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>How is this different from running <code>flutter analyze</code> or a code-quality SaaS?</summary>
         <div><p><code>flutter analyze</code> tells you what is syntactically wrong. The audit tells you what is strategically wrong. A linter sees code. I see decisions.</p></div>
       </details>
-      <details class="faq-item js-reveal">
-        <summary>What if you find the problem is too big for a 5-day audit?</summary>
-        <div><p>I tell you on Day 2, refund the unused portion of the fee, and write up what I have found so far in whatever shape is useful to you. If you want a case where this happened in real life, ask on the intake call. I will walk you through it with the client’s permission.</p></div>
+      <details class="faq-item" data-reveal data-reveal-group="faq">
+        <summary>What if you find the problem is too big for a 3-day audit?</summary>
+        <div><p>I tell you on Day 2, refund in full, and write up what I have found so far in whatever shape is useful to you. The 3-day audit is sized to diagnose, not to rewrite. If your problem genuinely needs ten engineer-days, the report says so on Day 2 and we both move on.</p></div>
       </details>
-      <details class="faq-item js-reveal">
+      <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Do you do the fixes too?</summary>
         <div><p>Usually no. The audit is the product. Most teams find their own engineers ship the fix list faster than I could, and they learn the codebase along the way. For unusual cases (a custom shader to be written, a <code>vector_math_64</code> rewrite of a gesture system), I do take implementation work, but only after the audit, and only if you ask.</p></div>
       </details>
@@ -473,13 +480,13 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="about" aria-labelledby="about-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">07</span>&nbsp;The engineer</p>
       <h2 id="about-h"><span class="lw">The person opening your repo.</span></h2>
     </header>
 
-    <div class="about js-reveal">
-      <figure class="portrait-frame">
+    <div class="about">
+      <figure class="portrait-frame" data-reveal>
         <picture>
           <source type="image/avif" srcset="/assets/portrait-320.avif 320w, /assets/portrait-480.avif 480w, /assets/portrait-640.avif 640w, /assets/portrait-960.avif 960w" sizes="(max-width: 720px) 70vw, 280px">
           <source type="image/webp" srcset="/assets/portrait-320.webp 320w, /assets/portrait-480.webp 480w, /assets/portrait-640.webp 640w, /assets/portrait-960.webp 960w" sizes="(max-width: 720px) 70vw, 280px">
@@ -490,7 +497,7 @@
           <span>One audit at a time</span>
         </figcaption>
       </figure>
-      <div class="about-body stack-lg">
+      <div class="about-body stack-lg" data-reveal>
         <p>I am a senior Flutter engineer. I have spent the last several years building, debugging, and unsticking Flutter apps in production: scrolling that drops frames on flagship phones, custom animations that have to look correct on a Pixel 3a, gesture systems that hold up at 120 Hz on iPad Pro. I work in <code>vector_math_64</code>. I write shaders when the off-the-shelf paint will not render fast enough. I read frame timelines when I am stuck, which is often the fastest way out.</p>
         <p><strong>What that means for you:</strong> when your app feels slow, I can usually say why inside a day. Rebuild storm, shader compile, expensive paint, main-thread work, image decode, layout thrash. The diagnosis is the hard part. The fix is usually small. The audit is me, your codebase, and the answer.</p>
         <p>I take one audit at a time. That is the whole business. No agency, no team, no handoffs, no junior doing the work. If you hire the audit, you get me.</p>
@@ -504,7 +511,7 @@
      ═══════════════════════════════════════════════════════════ -->
 <section class="section cta-section" id="book" aria-labelledby="book-h">
   <div class="page">
-    <header class="section-head">
+    <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">08</span>&nbsp;Book</p>
       <h2 id="book-h"><span class="lw">Send me your repo.</span></h2>
       <p class="lede muted">Or describe the one thing hurting most. I read every form myself, usually within 24 hours.</p>
@@ -513,24 +520,24 @@
     <form class="form" data-intake method="POST" action="https://formspree.io/f/REPLACE_ME">
       <input class="honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
 
-      <div class="form-row">
+      <div class="form-row" data-reveal data-reveal-group="form">
         <label for="f-name">Name</label>
         <input id="f-name" name="name" type="text" required autocomplete="name" placeholder="Alex Chen" minlength="2" maxlength="80">
       </div>
 
-      <div class="form-row">
+      <div class="form-row" data-reveal data-reveal-group="form">
         <label for="f-email">Work email</label>
         <input id="f-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="alex@yourcompany.com" maxlength="120">
         <p class="hint">I reply from a real address. No marketing list.</p>
       </div>
 
-      <div class="form-row">
+      <div class="form-row" data-reveal data-reveal-group="form">
         <label for="f-repo">Repo or app</label>
         <input id="f-repo" name="repo" type="text" placeholder="github.com/yourcompany/your-app or a one-line description" maxlength="200">
         <p class="hint">Public URL, private repo invite, or just tell me what platform stores you are on. We can sort access after the first reply.</p>
       </div>
 
-      <div class="form-row">
+      <div class="form-row" data-reveal data-reveal-group="form">
         <label for="f-symptom">What is hurting most right now?</label>
         <textarea id="f-symptom" name="symptom" rows="4" placeholder="Scrolling is janky on Android. New devs take a month to onboard. Crashes are spiking after the last release. One symptom in your own words." maxlength="800"></textarea>
         <p class="hint">One symptom is enough. The audit will find the rest.</p>

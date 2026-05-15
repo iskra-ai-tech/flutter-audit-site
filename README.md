@@ -1,6 +1,6 @@
 # Flutter Audit Site
 
-A single-page portfolio + sales page for a 5-day Flutter app audit.
+A single-page portfolio + sales page for a 3-day Flutter app audit for $500.
 
 Hand-coded HTML/CSS/JS. No framework, no runtime, no tracker. Built as a deliberate counterweight to "agency template" portfolios: editorial near-black, system fonts, restrained motion, one champagne accent.
 

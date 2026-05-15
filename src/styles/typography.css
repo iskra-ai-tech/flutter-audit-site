@@ -16,7 +16,10 @@ body {
 
 h1, h2, h3, h4 {
   color: var(--ink-strong);
-  text-wrap: balance;
+  /* `pretty` (not `balance`) — balance re-runs whenever H2 geometry
+     changes (incl. after a transform release) and was the second
+     mechanism behind the post-animation layout jump. */
+  text-wrap: pretty;
   font-weight: 600;
   letter-spacing: -0.02em;
 }

@@ -39,7 +39,7 @@ const SITE = {
   origin: RAW_ORIGIN,
   basePath,
   title: "Flutter App Audit — Senior Engineer, Fixed Price, 5 Days",
-  description: "A senior Flutter engineer who reads codebases the way an auditor reads a balance sheet. 5-day fixed-price audit. Ranked fix list, frame-by-frame perf report, walkthrough call. The estimate is my risk.",
+  description: "A senior Flutter engineer who reads codebases the way an auditor reads a balance sheet. 3-day audit for $500 flat. Ranked fix list, frame-by-frame perf report, 60-minute walkthrough.",
   ogImage: "/og.png",
   twitter: "@flutteraudit",
 };
@@ -59,7 +59,7 @@ const brotliFile = async (src) => {
 };
 
 // ── 1. Read & inline CSS layers in order ─────────────────────
-const cssOrder = ["tokens.css", "reset.css", "typography.css", "layout.css", "components.css", "hero.css", "sections.css", "checklist.css", "animations.css"];
+const cssOrder = ["tokens.css", "reset.css", "typography.css", "layout.css", "components.css", "hero.css", "sections.css", "checklist.css", "animations.css", "reveals.css"];
 const cssParts = [];
 for (const name of cssOrder) {
   const p = join(SRC, "styles", name);
@@ -209,8 +209,8 @@ try {
   <rect x="120" y="220" width="140" height="2" fill="#D9A463"/>
   <text x="120" y="320" fill="#F4F4F6" font-family="-apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, sans-serif" font-size="84" font-weight="600" letter-spacing="-2">Your Flutter app</text>
   <text x="120" y="412" fill="#F4F4F6" font-family="-apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, sans-serif" font-size="84" font-weight="600" letter-spacing="-2">is fixable.</text>
-  <text x="120" y="490" fill="#9C9DA4" font-family="-apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, sans-serif" font-size="28" letter-spacing="-0.5">Five-day fixed-price audit. By Nikita Kalaganov.</text>
-  <text x="120" y="555" fill="#777b7f" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="16" letter-spacing="2">flutteraudit.dev</text>
+  <text x="120" y="490" fill="#D9A463" font-family="-apple-system, BlinkMacSystemFont, Helvetica Neue, Arial, sans-serif" font-size="32" font-weight="500" letter-spacing="-0.5">$500 · 3 days · By Nikita Kalaganov.</text>
+  <text x="120" y="555" fill="#777b7f" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="16" letter-spacing="2">flutteraudit.com</text>
 </svg>`);
   await sharp(ogSvg, { density: 110 }).png({ compressionLevel: 9, quality: 92 }).toFile(join(PUBLIC_DIR, "og.png"));
 } catch (e) {
@@ -246,20 +246,20 @@ await writeText(join(PUBLIC_DIR, "sitemap.xml"), `<?xml version="1.0" encoding="
 
 await writeText(join(PUBLIC_DIR, "llms.txt"), `# Flutter App Audit — Nikita Kalaganov
 
-> Senior Flutter engineer offering a 5-day fixed-price code audit. One audit at a time.
+> Senior Flutter engineer offering a 3-day Flutter app audit for $500 flat. One audit at a time.
 > Specialist domains: debugging, performance, Impeller, custom animations, shaders, vector_math_64.
-> The estimate is the engineer's risk; the price is fixed when quoted.
+> $500 flat. No upsell, no day-rate creep. If the work runs over, the engineer absorbs it.
 
 ## What this site is
 
-A single landing page selling a 5-day Flutter app audit, delivered as a ranked fix list, a frame-by-frame performance report, a plain-English brief, and a 60-minute walkthrough call.
+A single landing page selling a 3-day Flutter app audit for $500 flat, delivered as a ranked fix list, a frame-by-frame performance report, a plain-English brief, and a 60-minute walkthrough call.
 
 ## Service
 
 - name: Flutter App Audit
-- duration: 5 working days
-- price: quoted after repo inspection, fixed at quote
-- guarantee: if the audit overruns the estimate, the engineer absorbs the cost; if the audit cannot deliver what was scoped by day 2, the unspent portion is refunded
+- duration: 3 working days
+- price: $500 USD flat (fixed at booking)
+- guarantee: if the audit cannot deliver what was scoped by day 2, the engineer refunds in full and sends the partial findings as a deliverable
 - deliverables: ranked fix list, performance report with before/after frame timings, two-page brief, 60-minute walkthrough recorded, roadmap notes
 - post-engagement: two weeks of async clarifications + PR review
 
