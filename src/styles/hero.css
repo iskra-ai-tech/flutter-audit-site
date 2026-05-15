@@ -1,64 +1,47 @@
 /* ============================================================
-   Hero — maximalist multi-phase entrance, composite-only.
-   Layers (asymmetric durations, counter-motion preserved):
-     · page-horizon hairline (700ms draw + 1.6s shimmer one-shot,
-       then 9s cadence)
-     · dot grid (1200ms mask reveal, 60s continuous drift,
-       scroll-linked parallax up to -20%)
-     · eyebrow letter-tracking-in (700ms, 0.40em→0.12em)
-     · H1 line-wipe (3 lines × 600ms, 140ms stagger, line 3
-       overshoots via --ease-spring)
-     · brass rule draw (460ms) + 1 shimmer pass + 9s cadence
-     · headline-mass shimmer (1200ms, fires after line 3 settles)
-     · caret materialise + 2.4s ease-in-out pulse (0.55↔1.0)
-     · scroll-out: hairline fades, grid lifts faster than text,
-       brass rule scaleX→0 (left-anchored)
+   Hero — static styles. All entrance + persistent motion is
+   driven by motion.js v3 (Web Animations API). CSS only defines
+   the visible *resting* state and the canvas container.
    ============================================================ */
 
-/* ─── 0. Page-horizon hairline (top of hero, below nav) ───── */
+/* Page-horizon hairline below the nav. JS draws it on load. */
 .hero-hairline {
   position: relative;
   z-index: 3;
   height: 1px;
-  margin: 0;
   background: var(--hairline-strong);
   transform-origin: left center;
-  transform: scaleX(0);
-  animation: heroHairlineDraw 700ms var(--ease-out-quart) 80ms forwards;
+  transform: scaleX(1);
   overflow: hidden;
   isolation: isolate;
 }
-.hero-hairline::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    transparent 35%,
-    color-mix(in oklch, var(--accent) 75%, transparent) 50%,
-    transparent 65%,
-    transparent 100%);
-  transform: translateX(-100%);
-  animation: heroHairlineShimmer 1400ms var(--ease-out-quart) 900ms forwards;
-  pointer-events: none;
-}
-@keyframes heroHairlineDraw  { to { transform: scaleX(1); } }
-@keyframes heroHairlineShimmer {
-  0%   { transform: translateX(-100%); opacity: 0.0; }
-  18%  { opacity: 1.0; }
-  82%  { opacity: 1.0; }
-  100% { transform: translateX(100%); opacity: 0.0; }
-}
 
-/* Hero shell — unchanged structurally, gains a scroll-out hook */
+/* Hero shell */
 .hero {
   position: relative;
   padding-block: clamp(5.5rem, 11vw, 9.5rem) clamp(3.5rem, 7vw, 6rem);
   overflow: hidden;
   isolation: isolate;
-  view-timeline-name: --hero-view;
-  view-timeline-axis: block;
+  /* Subtle vignette over the canvas so type stays legible */
+  background:
+    radial-gradient(ellipse 80% 70% at 30% 35%,
+      transparent 0%,
+      oklch(0.145 0.010 250 / 0.35) 70%,
+      oklch(0.145 0.010 250 / 0.85) 100%),
+    var(--bg);
 }
+
+/* JS-injected <canvas class="hero-canvas"> goes at z-index: 0.
+   Falls back to the dot grid below if canvas creation is blocked. */
+.hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .hero-page {
   position: relative;
   z-index: 2;
@@ -67,54 +50,25 @@
   max-width: var(--w-narrow);
 }
 
-/* ─── 1. Dot grid — mask reveal, slow drift, scroll parallax ── */
+/* ─── CSS dot-grid fallback ────────────────────────────────── */
 .hero-grid {
   position: absolute;
-  inset: -8% 0 0 0;
+  inset: 0;
   pointer-events: none;
   z-index: 0;
   background-image:
     radial-gradient(oklch(0.27 0.006 250) 0.7px, transparent 0.7px);
   background-size: 28px 28px;
-  background-position: 0 0;
+  background-position: -2px -2px;
   mask-image: radial-gradient(ellipse 64% 70% at 35% 35%,
                               #000 0%, #000 40%, transparent 92%);
-  mask-size: 8% 8%;
-  mask-position: 35% 35%;
-  mask-repeat: no-repeat;
-  opacity: 0;
-  transform: translate3d(0, 0, 0) scale(0.985);
-  animation:
-    heroGridReveal 1200ms var(--ease-emphasized) 120ms forwards,
-    heroGridDrift 60s var(--ease-linear) 1200ms infinite;
+  opacity: 0.35;
 }
-@keyframes heroGridReveal {
-  0%   { opacity: 0; transform: scale(0.985); mask-size: 8% 8%; }
-  60%  { opacity: 0.55; }
-  100% { opacity: 0.55; transform: scale(1); mask-size: 220% 220%; }
-}
-@keyframes heroGridDrift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to   { transform: translate3d(180px, 180px, 0) scale(1); }
-}
+/* Hide the static grid once the canvas constellation is up — they shouldn't
+   both render. JS adds .has-canvas to .hero when the canvas is created. */
+.hero.has-canvas .hero-grid { display: none; }
 
-/* Scroll-out: grid lifts up to -20% as the hero exits its view */
-@supports (animation-timeline: view()) {
-  .hero-grid {
-    animation:
-      heroGridReveal 1200ms var(--ease-emphasized) 120ms forwards,
-      heroGridDrift 60s var(--ease-linear) 1200ms infinite,
-      heroGridParallax linear both;
-    animation-timeline: auto, auto, --hero-view;
-    animation-range: normal, normal, exit -10% exit 100%;
-  }
-  @keyframes heroGridParallax {
-    from { translate: 0 0; }
-    to   { translate: 0 -20%; }
-  }
-}
-
-/* ─── 2. Eyebrow — letter-tracking-in (single animation) ──── */
+/* ─── Eyebrow ───────────────────────────────────────────── */
 .hero-eyebrow {
   font-family: var(--font-mono);
   font-size: var(--type-label);
@@ -128,16 +82,10 @@
 }
 .hero-eyebrow-text {
   display: inline-block;
-  opacity: 0;
-  letter-spacing: 0.40em;
-  animation: heroEyebrowTrackIn 700ms var(--ease-out-quart) 160ms forwards;
-}
-@keyframes heroEyebrowTrackIn {
-  0%   { opacity: 0; letter-spacing: 0.40em; }
-  100% { opacity: 1; letter-spacing: 0.12em; }
+  /* JS sets initial style.opacity = 0; we keep no animation here */
 }
 
-/* ─── 3. Byline ─── */
+/* ─── Byline ─────────────────────────────────────────────── */
 .hero-byline {
   display: flex;
   align-items: center;
@@ -145,9 +93,6 @@
   font-size: 0.9375rem;
   color: var(--ink-muted);
   line-height: 1.5;
-  opacity: 0;
-  transform: translateY(8px);
-  animation: heroFgLift 320ms var(--ease-emphasized) 280ms forwards;
 }
 .hero-byline-portrait {
   width: 28px;
@@ -159,7 +104,7 @@
   flex-shrink: 0;
 }
 
-/* ─── 4. Headline — H1 line-wipe (clip-and-roll) ─── */
+/* ─── Headline — clip-and-roll structure ─────────────────── */
 .hero-headline {
   font-size: var(--type-display);
   line-height: var(--lh-display);
@@ -177,50 +122,11 @@
 }
 .hero-headline .line-inner {
   display: inline-block;
-  transform: translateY(110%);
   will-change: transform;
-  animation: heroLineRoll 600ms var(--ease-emphasized) forwards;
 }
-.hero-headline .line:nth-child(1) .line-inner { animation-delay: 380ms; }
-.hero-headline .line:nth-child(2) .line-inner { animation-delay: 520ms; }
-.hero-headline .line:nth-child(3)             { color: var(--ink-muted); }
-.hero-headline .line:nth-child(3) .line-inner {
-  animation: heroLineRollSpring 760ms var(--ease-spring) 660ms forwards;
-}
-@keyframes heroLineRoll {
-  from { transform: translateY(110%); }
-  to   { transform: translateY(0); }
-}
-@keyframes heroLineRollSpring {
-  from { transform: translateY(110%); }
-  to   { transform: translateY(0); }
-}
+.hero-headline .line:nth-child(3) { color: var(--ink-muted); }
 
-/* ─── 5. Headline-mass shimmer (one-shot, after line 3 settles) ─ */
-.hero-headline::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(105deg,
-    transparent 0%,
-    transparent 40%,
-    color-mix(in oklch, var(--ink-strong) 22%, transparent) 50%,
-    transparent 60%,
-    transparent 100%);
-  mix-blend-mode: screen;
-  opacity: 0;
-  transform: translateX(-30%);
-  animation: heroHeadlineShimmer 1200ms var(--ease-out-quart) 1500ms forwards;
-}
-@keyframes heroHeadlineShimmer {
-  0%   { transform: translateX(-30%); opacity: 0; }
-  20%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { transform: translateX(30%); opacity: 0; }
-}
-
-/* ─── 6. Brass rule — draw + shimmer pass + 9s cadence ─── */
+/* ─── Brass rule ─────────────────────────────────────────── */
 .hero-rule {
   display: block;
   position: relative;
@@ -229,54 +135,12 @@
   border: 0;
   background: var(--accent);
   transform-origin: left center;
-  transform: scaleX(0);
   margin: var(--s-2) 0 var(--s-4);
-  animation:
-    heroRuleDraw 460ms var(--ease-out-quart) 700ms forwards,
-    heroRuleScaleOut linear both;
-  animation-timeline: auto, --hero-view;
-  animation-range: normal, exit 0% exit 60%;
   overflow: hidden;
   isolation: isolate;
 }
-.hero-rule::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    color-mix(in oklch, white 65%, transparent) 50%,
-    transparent 100%);
-  transform: translateX(-100%);
-  animation:
-    heroRuleShimmerOnce 900ms var(--ease-out-quart) 2760ms forwards,
-    heroRuleShimmerLoop 9s var(--ease-linear) 5160ms infinite;
-  pointer-events: none;
-}
-@keyframes heroRuleDraw     { to { transform: scaleX(1); } }
-@keyframes heroRuleScaleOut { to { transform: scaleX(0); } }
-@keyframes heroRuleShimmerOnce {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
-}
-@keyframes heroRuleShimmerLoop {
-  0%, 89%   { transform: translateX(-100%); }
-  90%       { transform: translateX(-100%); }
-  100%      { transform: translateX(100%); }
-}
 
-/* ─── 7. Lede, CTAs, trust — mid-fg lifts ─── */
-.hero-lede,
-.hero-ctas,
-.hero-trust {
-  opacity: 0;
-  transform: translateY(8px);
-  animation: heroFgLift 320ms var(--ease-emphasized) forwards;
-}
-.hero-lede  { animation-delay: 1240ms; }
-.hero-ctas  { animation-delay: 1360ms; }
-.hero-trust { animation-delay: 1460ms; }
-
+/* ─── Lede + CTAs + trust ────────────────────────────────── */
 .hero-lede {
   font-size: var(--type-lede);
   line-height: var(--lh-lede);
@@ -298,11 +162,8 @@
   color: var(--ink-faint);
   margin-top: var(--s-2);
 }
-@keyframes heroFgLift {
-  to { opacity: 1; transform: translateY(0); }
-}
 
-/* ─── 8. Caret — materialise then calm pulse (1.0 ↔ 0.55) ─── */
+/* ─── Caret — visible bar after the third line ───────────── */
 .hero-caret {
   display: inline-block;
   width: 0.45em;
@@ -310,61 +171,10 @@
   margin-left: 0.08em;
   background: var(--accent);
   vertical-align: -0.10em;
-  opacity: 0;
   transform-origin: bottom center;
-  animation:
-    caretIn 220ms var(--ease-out-quart) 1260ms forwards,
-    caretPulse 2400ms ease-in-out 2280ms infinite;
-}
-@keyframes caretIn   { from { opacity: 0; transform: scaleY(0.5); }
-                       to   { opacity: 1; transform: scaleY(1); } }
-@keyframes caretPulse {
-  0%, 100% { opacity: 1.0; }
-  50%      { opacity: 0.55; }
 }
 
-/* ─── 9. Page-horizon hairline fade on scroll-out ─── */
-@supports (animation-timeline: view()) {
-  .hero-hairline {
-    animation:
-      heroHairlineDraw 700ms var(--ease-out-quart) 80ms forwards,
-      heroHairlineFade linear both;
-    animation-timeline: auto, --hero-view;
-    animation-range: normal, exit 0% exit 80%;
-  }
-  @keyframes heroHairlineFade {
-    to { opacity: 0; }
-  }
-}
-
-/* ─── 10. Reduced-motion path — collapse all to 120ms opacity ─ */
+/* ─── Reduced-motion path: no transforms, full visibility ── */
 @media (prefers-reduced-motion: reduce) {
-  .hero-hairline,
-  .hero-hairline::after,
-  .hero-grid,
-  .hero-eyebrow-text,
-  .hero-byline,
-  .hero-headline .line-inner,
-  .hero-headline::after,
-  .hero-rule,
-  .hero-rule::after,
-  .hero-lede,
-  .hero-ctas,
-  .hero-trust,
-  .hero-caret {
-    animation: heroRMFade 120ms linear forwards !important;
-    transform: none !important;
-    letter-spacing: initial !important;
-    mask-image: none !important;
-    mask-size: auto !important;
-  }
-  .hero-headline .line-inner { transform: none !important; }
-  .hero-rule       { transform: scaleX(1) !important; }
-  .hero-hairline   { transform: scaleX(1) !important; }
-  .hero-grid       { opacity: 0.55 !important; }
-  .hero-rule::after,
-  .hero-hairline::after,
-  .hero-caret { animation: none !important; }
-  .hero-caret { opacity: 1 !important; }
-  @keyframes heroRMFade { to { opacity: 1; } }
+  .hero-canvas { display: none; }
 }

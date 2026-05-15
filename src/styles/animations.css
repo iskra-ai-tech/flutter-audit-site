@@ -1,17 +1,17 @@
 /* ============================================================
-   Scroll-driven animations — section-level multi-phase choreography.
-   CSS-first (animation-timeline: view()/scroll()), JS fallback via IO.
-   All composite-only: transform, opacity, clip-path, filter, mask.
+   animations.css — all reveal motion is JS-driven (motion.js v3).
+   This file only defines:
+     · the scroll-progress bar baseline (JS scales it)
+     · the .lw line-wipe wrapper (used by JS line-wipes)
+     · the nav-reveal transitions
+     · prefers-reduced-motion → static-visible final state
+   No CSS @supports (animation-timeline: view()) is used —
+   that API had inconsistent behavior across Safari/Chrome
+   making the page appear blank to users. JS WAAPI is the
+   single source of truth now.
    ============================================================ */
 
-/* Register --pricing-num so the $0 → $4,800 scrub can interpolate */
-@property --pricing-num {
-  syntax: "<integer>";
-  initial-value: 0;
-  inherits: false;
-}
-
-/* ─── Line-wipe primitive for H2 ───────────────────────────── */
+/* Line-wipe wrapper primitive (overflow-clip parent for translateY children) */
 .lw {
   display: inline-block;
   overflow: hidden;
@@ -20,207 +20,24 @@
 }
 .lw > * { display: inline-block; }
 
-/* ─── Scroll-driven block (modern browsers only) ───────────── */
-@supports (animation-timeline: view()) {
-  /* 1. Section eyebrow track-in + headline line-wipe ─────────── */
-  .section-head .eyebrow {
-    animation: eyebrowTrack linear both;
-    animation-timeline: view();
-    animation-range: entry 8% cover 22%;
-    letter-spacing: 0.4em;
-    opacity: 0;
-  }
-  .section-head h2 {
-    animation: lineWipe linear both;
-    animation-timeline: view();
-    animation-range: entry 14% cover 28%;
-  }
-  .section-head .lede {
-    animation: revealLift linear both;
-    animation-timeline: view();
-    animation-range: entry 16% cover 30%;
-  }
-
-  /* 2. §2 Problem cards — 4-layer reveal, 60 ms inter-card ── */
-  .problem-card                                { opacity: 0; transform: translateY(18px); }
-  .problem-card .num                           { opacity: 0; transform: scale(0.94); }
-  .problem-card h3                             { opacity: 0; }
-  .problem-card > p:not(.num)                  { opacity: 0; }
-
-  .problem-card                                { animation: cardLiftSoft linear both; animation-timeline: view(); animation-range: entry  8% cover 22%; }
-  .problem-card .num                           { animation: numPop      linear both; animation-timeline: view(); animation-range: entry 10% cover 18%; }
-  .problem-card h3                             { animation: textFadeIn  linear both; animation-timeline: view(); animation-range: entry 14% cover 22%; }
-  .problem-card > p:not(.num)                  { animation: textFadeIn  linear both; animation-timeline: view(); animation-range: entry 20% cover 28%; }
-
-  .problem-card:nth-child(2)                   { animation-range: entry 10% cover 24%; }
-  .problem-card:nth-child(2) .num              { animation-range: entry 12% cover 20%; }
-  .problem-card:nth-child(2) h3                { animation-range: entry 16% cover 24%; }
-  .problem-card:nth-child(2) > p:not(.num)     { animation-range: entry 22% cover 30%; }
-
-  .problem-card:nth-child(3)                   { animation-range: entry 12% cover 26%; }
-  .problem-card:nth-child(3) .num              { animation-range: entry 14% cover 22%; }
-  .problem-card:nth-child(3) h3                { animation-range: entry 18% cover 26%; }
-  .problem-card:nth-child(3) > p:not(.num)     { animation-range: entry 24% cover 32%; }
-
-  /* 3. §3 Deliverables bento — 5-layer, 80 ms inter, top hairline ── */
-  .bento-card                                  { opacity: 0; transform: translateY(16px); position: relative; }
-  .bento-card .bento-num                       { opacity: 0; transform: translateY(6px); }
-  .bento-card h3                               { opacity: 0; transform: translateY(4px); }
-  .bento-card > p:not(.bento-num):not(.bento-card-edge) { opacity: 0; }
-  .bento-card .bento-card-edge                 { opacity: 0; }
-  .bento-card::before {
-    content: ""; position: absolute;
-    top: -1px; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent 0%, var(--accent-soft) 30%, var(--accent-soft) 70%, transparent 100%);
-    transform: scaleX(0);
-    transform-origin: left center;
-    pointer-events: none;
-    animation: ruleDraw linear both;
-    animation-timeline: view();
-    animation-range: entry 6% cover 20%;
-    z-index: 2;
-  }
-
-  .bento-card                                  { animation: cardLiftSoft linear both; animation-timeline: view(); animation-range: entry  8% cover 24%; }
-  .bento-card .bento-num                       { animation: layerUp      linear both; animation-timeline: view(); animation-range: entry 10% cover 18%; }
-  .bento-card h3                               { animation: layerUp      linear both; animation-timeline: view(); animation-range: entry 14% cover 22%; }
-  .bento-card > p:not(.bento-num):not(.bento-card-edge) { animation: textFadeIn linear both; animation-timeline: view(); animation-range: entry 18% cover 26%; }
-  .bento-card .bento-card-edge                 { animation: textFadeIn   linear both; animation-timeline: view(); animation-range: entry 24% cover 30%; }
-
-  .bento-card:nth-child(2)                     { animation-range: entry 10% cover 26%; }
-  .bento-card:nth-child(2)::before             { animation-range: entry  8% cover 22%; }
-  .bento-card:nth-child(3)                     { animation-range: entry 12% cover 28%; }
-  .bento-card:nth-child(3)::before             { animation-range: entry 10% cover 24%; }
-  .bento-card:nth-child(4)                     { animation-range: entry 14% cover 30%; }
-  .bento-card:nth-child(4)::before             { animation-range: entry 12% cover 26%; }
-  .bento-card:nth-child(5)                     { animation-range: entry 16% cover 32%; }
-  .bento-card:nth-child(5)::before             { animation-range: entry 14% cover 28%; }
-
-  /* 4. §5 Process rail + day-roll ─────────────────────────────── */
-  .process { view-timeline-name: --process; view-timeline-axis: block; position: relative; }
-  .process-rail {
-    position: absolute;
-    left: calc(96px / 2 - 0.5px);
-    top: 0; bottom: 0;
-    width: 1px;
-    background: linear-gradient(180deg, transparent 0%, var(--hairline) 8%, var(--hairline) 92%, transparent 100%);
-    transform-origin: top center;
-    transform: scaleY(0);
-    animation: railDraw linear both;
-    animation-timeline: --process;
-    animation-range: entry 0% cover 80%;
-    pointer-events: none;
-  }
-  @media (max-width: 640px) { .process-rail { display: none; } }
-
-  .process-step .process-day {
-    animation: dayRoll linear both;
-    animation-timeline: view();
-    animation-range: entry 8% cover 22%;
-    display: inline-block;
-    will-change: transform;
-  }
-  .process-step:nth-child(3) .process-day { animation-range: entry 10% cover 24%; }
-  .process-step:nth-child(4) .process-day { animation-range: entry 12% cover 26%; }
-  .process-step:nth-child(5) .process-day { animation-range: entry 14% cover 28%; }
-
-  /* 5. §4 Philosophy — line-wipe per paragraph ───────────────── */
-  .philosophy p {
-    animation: philLineWipe linear both;
-    animation-timeline: view();
-    animation-range: entry 10% cover 26%;
-    clip-path: inset(0 0 100% 0);
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  .philosophy p + p { animation-range: entry 14% cover 30%; }
-
-  /* 6. §6 Pricing — brass commit underline ──────────────────── */
-  .pricing { position: relative; }
-  .pricing .pricing-anchor::after {
-    content: "";
-    position: absolute;
-    left: 0; right: 0;
-    bottom: -0.5rem;
-    height: 1px;
-    background: var(--accent);
-    transform: scaleX(0);
-    transform-origin: left center;
-    animation: ruleDraw linear both;
-    animation-timeline: view();
-    animation-range: entry 28% cover 42%;
-  }
-  .pricing-anchor { position: relative; padding-bottom: 0.5rem; }
-
-  /* 7. §7 FAQ — stagger entry ─────────────────────────────── */
-  .faq-item                                    { animation: revealLift linear both; animation-timeline: view(); animation-range: entry  8% cover 22%; }
-  .faq-item:nth-child(2)                       { animation-range: entry 10% cover 24%; }
-  .faq-item:nth-child(3)                       { animation-range: entry 12% cover 26%; }
-  .faq-item:nth-child(4)                       { animation-range: entry 14% cover 28%; }
-  .faq-item:nth-child(5)                       { animation-range: entry 16% cover 30%; }
-  .faq-item:nth-child(6)                       { animation-range: entry 18% cover 32%; }
-
-  /* 8. §8 About — portrait 3-phase + grain climb ────────────── */
-  .portrait-frame {
-    animation: portraitPhases linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 60%;
-  }
-  .portrait-frame::after {
-    animation: grainIn linear both;
-    animation-timeline: view();
-    animation-range: entry 10% cover 50%;
-  }
-
-  /* 9. About body lift */
-  .about-body { animation: revealLift linear both; animation-timeline: view(); animation-range: entry 8% cover 24%; }
-
-  /* 10. Proof grid (kept for future use) ───────────────────── */
-  .proof-grid { animation: revealLift linear both; animation-timeline: view(); animation-range: entry 8% cover 24%; }
-
-  /* 11. Hairline section dividers — sweep on enter ─────────── */
-  .section + .section { position: relative; }
-  .section + .section::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: -1px;
-    height: 1px;
-    background:
-      linear-gradient(90deg,
-        transparent 0%,
-        transparent 40%,
-        var(--accent-soft) 50%,
-        transparent 60%,
-        transparent 100%);
-    background-size: 200% 100%;
-    background-position: 100% 0;
-    animation: dividerSweep linear both;
-    animation-timeline: view();
-    animation-range: entry 0% cover 14%;
-    pointer-events: none;
-    opacity: 0.7;
-  }
+/* Scroll-progress bar — JS animates transform: scaleX(0 → 1) */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  z-index: 70;
+  pointer-events: none;
+  will-change: transform;
 }
 
-/* ─── Scroll progress bar (top, fixed) ────────────────────── */
-@supports (animation-timeline: scroll(root)) {
-  .scroll-progress {
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 2px;
-    background: var(--accent);
-    transform-origin: left center;
-    transform: scaleX(0);
-    z-index: 70;
-    pointer-events: none;
-    animation: scrollFill linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0% 100%;
-  }
-  @keyframes scrollFill { to { transform: scaleX(1); } }
-}
+/* Nav reveal-on-upscroll (orchestrated from motion.js) */
+.nav[data-revealed="false"] { transform: translateY(-100%); transition: transform var(--d-mid) var(--ease-emphasized); }
+.nav[data-revealed="true"]  { transform: translateY(0); transition: transform var(--d-mid) var(--ease-emphasized); }
 
-/* ─── Fallback: JS IntersectionObserver path ──────────────── */
+/* Fallback IO-driven reveal class — JS adds .is-in when it runs */
 .js-reveal {
   opacity: 0;
   transform: translateY(10px);
@@ -229,57 +46,10 @@
   will-change: transform, opacity;
 }
 .js-reveal.is-in { opacity: 1; transform: none; }
-.js-stagger > .js-reveal:nth-child(2) { transition-delay: 80ms; }
-.js-stagger > .js-reveal:nth-child(3) { transition-delay: 160ms; }
-.js-stagger > .js-reveal:nth-child(4) { transition-delay: 240ms; }
-.js-stagger > .js-reveal:nth-child(5) { transition-delay: 320ms; }
 
-/* Nav reveal-on-upscroll (orchestrated from motion.js) */
-.nav[data-revealed="false"] { transform: translateY(-100%); transition: transform var(--d-mid) var(--ease-emphasized); }
-.nav[data-revealed="true"]  { transform: translateY(0); transition: transform var(--d-mid) var(--ease-emphasized); }
-
-/* ─── Keyframes ─────────────────────────────────────────── */
-@keyframes revealLift     { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes eyebrowTrack   { 0% { opacity: 0; letter-spacing: 0.4em; } 60% { opacity: 1; } 100% { opacity: 1; letter-spacing: 0.12em; } }
-@keyframes lineWipe       { 0% { opacity: 0; transform: translateY(110%); clip-path: inset(0 0 100% 0); } 35% { opacity: 1; } 100% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); } }
-@keyframes cardLiftSoft   { 0% { opacity: 0; transform: translateY(18px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes numPop         { 0% { opacity: 0; transform: scale(0.94); } 60% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
-@keyframes textFadeIn     { 0% { opacity: 0; } 100% { opacity: 1; } }
-@keyframes layerUp        { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes ruleDraw       { 0% { transform: scaleX(0); } 100% { transform: scaleX(1); } }
-@keyframes railDraw       { 0% { transform: scaleY(0); } 100% { transform: scaleY(1); } }
-@keyframes dayRoll        { 0% { opacity: 0; transform: translateY(12px); } 100% { opacity: 1; transform: translateY(0); } }
-@keyframes philLineWipe   { 0% { opacity: 0; transform: translateY(8px); clip-path: inset(0 0 100% 0); } 100% { opacity: 1; transform: translateY(0); clip-path: inset(0 0 0 0); } }
-@keyframes portraitPhases { 0% { opacity: 0.4; transform: scale(1.04); filter: blur(8px); } 50% { opacity: 0.85; transform: scale(1.01); filter: blur(2px); } 100% { opacity: 1; transform: scale(1); filter: blur(0); } }
-@keyframes grainIn        { 0% { opacity: 0; } 100% { opacity: 0.045; } }
-@keyframes dividerSweep   { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
-
-/* ─── Reduced-motion path — every scroll-driven effect off ─── */
+/* Reduced-motion path — kill the scroll-progress entirely and let JS
+   provide static-visible state on every other element. */
 @media (prefers-reduced-motion: reduce) {
-  @supports (animation-timeline: view()) {
-    .eyebrow, .section-head h2, .section-head .lede,
-    .problem-card, .problem-card .num, .problem-card h3, .problem-card > p,
-    .bento-card, .bento-card .bento-num, .bento-card h3, .bento-card > p, .bento-card .bento-card-edge,
-    .bento-card::before,
-    .process-step, .process-step .process-day, .process-rail,
-    .pricing, .pricing .pricing-anchor::after,
-    .philosophy, .philosophy p,
-    .faq-item,
-    .about, .about-body, .portrait-frame, .portrait-frame::after,
-    .proof-grid,
-    .section + .section::before {
-      animation: none !important;
-      opacity: 1 !important;
-      transform: none !important;
-      filter: none !important;
-      clip-path: none !important;
-      letter-spacing: normal !important;
-      background-position: 0 0 !important;
-    }
-  }
-  .js-reveal { opacity: 1; transform: none; transition: none; }
   .scroll-progress { display: none !important; }
-  .faq-item > div { transition: none !important; }
-  .pricing-count-digits::before { content: "4,800"; }
-  .pricing-count-digits { content: "4,800"; }
+  .js-reveal { opacity: 1; transform: none; transition: none; }
 }
