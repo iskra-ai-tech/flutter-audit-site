@@ -23,8 +23,21 @@ const SRC        = join(ROOT, "src");
 const PUBLIC_DIR = join(ROOT, "public");
 const ASSETS     = join(SRC, "assets");
 
+/* SITE_ORIGIN can be overridden by env (used in CI for GitHub Pages where
+   the public URL is https://<user>.github.io/<repo>). If the origin contains
+   a non-root path component, that path is also used to rewrite every
+   absolute `/asset/...` reference in the HTML so the site works under a
+   subdirectory. */
+const RAW_ORIGIN = (process.env.SITE_ORIGIN || "https://flutteraudit.dev").replace(/\/+$/, "");
+let basePath = "";
+try {
+  const u = new URL(RAW_ORIGIN);
+  basePath = u.pathname === "/" ? "" : u.pathname.replace(/\/+$/, "");
+} catch { /* keep "" */ }
+
 const SITE = {
-  origin: "https://flutteraudit.dev",
+  origin: RAW_ORIGIN,
+  basePath,
   title: "Flutter App Audit — Senior Engineer, Fixed Price, 5 Days",
   description: "A senior Flutter engineer who reads codebases the way an auditor reads a balance sheet. 5-day fixed-price audit. Ranked fix list, frame-by-frame perf report, walkthrough call. The estimate is my risk.",
   ogImage: "/og.png",
@@ -88,6 +101,17 @@ let html = htmlSrc
   .replace(/{{site\.description}}/g, SITE.description)
   .replace(/{{site\.ogImage}}/g, SITE.ogImage);
 
+/* Path rewriting for subdirectory deploys (GitHub Pages project sites).
+   Every absolute root-relative URL becomes basePath-relative. */
+if (SITE.basePath) {
+  /* attributes: href="/x"  src="/x"  imagesrcset="/x ..."  poster="/x"
+     and srcset comma-separated entries that start with `, /` */
+  html = html
+    .replace(/(href|src|action|poster|imagesrcset|content)="\/(?!\/)/g, `$1="${SITE.basePath}/`)
+    .replace(/srcset="\/(?!\/)/g, `srcset="${SITE.basePath}/`)
+    .replace(/,\s*\/(?!\/)/g, `, ${SITE.basePath}/`);
+}
+
 // ── 4. Minify the HTML ───────────────────────────────────────
 try {
   const { minify } = await import("html-minifier-terser");
@@ -110,7 +134,11 @@ await mkdir(PUBLIC_DIR, { recursive: true });
 const htmlBytes = await writeText(join(PUBLIC_DIR, "index.html"), html);
 
 // ── 6. Photo pipeline (AVIF + WebP responsive) ──────────────
-const originalPng = join(ROOT, ".research", "nikita-original.png");
+/* Source is committed at src/assets/portrait-source.png. Falls back to the
+   legacy .research location, then to the SVG placeholder if neither exists. */
+const originalPng = existsSync(join(ASSETS, "portrait-source.png"))
+  ? join(ASSETS, "portrait-source.png")
+  : join(ROOT, ".research", "nikita-original.png");
 const placeholderSvg = join(ASSETS, "portrait-placeholder.svg");
 const portraitOut = join(PUBLIC_DIR, "assets");
 await mkdir(portraitOut, { recursive: true });
@@ -122,25 +150,39 @@ try {
 
   let input;
   if (existsSync(originalPng)) {
-    input = sharp(originalPng);
+    /* .rotate() applies EXIF orientation so phone-shot photos land upright. */
+    input = sharp(originalPng).rotate();
     portraitSourceUsed = "photo";
   } else if (existsSync(placeholderSvg)) {
     const svgBuf = await readFile(placeholderSvg);
     input = sharp(svgBuf, { density: 220 });
   } else {
-    // Inline fallback SVG buffer if no asset exists
     const svgBuf = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" width="320" height="400"><rect width="320" height="400" fill="#0E1014"/></svg>`);
     input = sharp(svgBuf, { density: 220 });
   }
 
-  const widths = [320, 480, 640, 960, 1280];
+  /* Portrait variants for the §8 about block (4:5 cover crop).
+     Sizes calibrated to the actual layout:
+       sizes="(max-width: 720px) 70vw, 280px"
+       phones DPR 2–3 → 640 or 960 device px
+       tablets/desktop DPR 2 → 560 → 640 satisfies
+     1280 would only fire on a DPR 4 device that does not exist in 2026.
+     JPG fallback dropped — WebP coverage globally ≥ 96 % per caniuse 2026. */
+  const widths = [320, 480, 640, 960];
   for (const w of widths) {
-    const base = input.clone().resize(w, Math.round(w * 1.25), { fit: "cover", position: "center" });
+    const base = input.clone().resize(w, Math.round(w * 1.25), { fit: "cover", position: "attention" });
     await base.clone().avif({ quality: 55, effort: 6 }).toFile(join(portraitOut, `portrait-${w}.avif`));
-    await base.clone().webp({ quality: 78, effort: 6 }).toFile(join(portraitOut, `portrait-${w}.webp`));
+    await base.clone().webp({ quality: 80, effort: 6 }).toFile(join(portraitOut, `portrait-${w}.webp`));
   }
-  // Fallback JPG for last resort
-  await input.clone().resize(960, 1200, { fit: "cover", position: "center" }).jpeg({ quality: 80, progressive: true, mozjpeg: true }).toFile(join(portraitOut, "portrait-960.jpg"));
+
+  /* Byline avatar — square crop, used at 32x32 in the hero. Tiny dedicated
+     variant so the browser doesn't downsample a portrait-orientation image
+     for a circular avatar (preserves perceived sharpness). */
+  for (const w of [64, 128]) {
+    const base = input.clone().resize(w, w, { fit: "cover", position: "attention" });
+    await base.clone().avif({ quality: 60, effort: 6 }).toFile(join(portraitOut, `avatar-${w}.avif`));
+    await base.clone().webp({ quality: 82, effort: 6 }).toFile(join(portraitOut, `avatar-${w}.webp`));
+  }
 } catch (e) {
   console.warn("[build] sharp not installed; copying placeholder SVG only.", e.message);
   if (existsSync(placeholderSvg)) await copyFile(placeholderSvg, join(portraitOut, "portrait.svg"));
