@@ -215,6 +215,14 @@
   font-size: 1.0625rem;
   letter-spacing: -0.005em;
   outline: none;
+  border-radius: var(--r-1);
+  padding-inline: var(--s-2);
+  margin-inline: calc(var(--s-2) * -1);
+}
+.faq-item > summary:focus-visible {
+  /* Explicit keyboard-focus ring on the summary toggle. */
+  box-shadow: var(--focus-ring);
+  outline: none;
 }
 .faq-item > summary::-webkit-details-marker { display: none; }
 .faq-item > summary::after {
@@ -278,6 +286,13 @@
   border-color: var(--ink-muted);
   background: oklch(0.20 0.006 250);
   outline: none;
+}
+.form input:focus-visible, .form textarea:focus-visible {
+  /* Explicit keyboard-focus ring on form fields. The reset.css global
+     :focus-visible adds a box-shadow ring; we re-declare here so specificity
+     keeps the ring visible after the :focus rule above. WCAG 2.4.7. */
+  box-shadow: var(--focus-ring);
+  border-color: var(--accent);
 }
 .form input:user-invalid, .form textarea:user-invalid { border-color: var(--signal-danger); }
 

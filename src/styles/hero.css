@@ -168,6 +168,10 @@
 
 /* ─── Layer 4 — caret (after headline finishes) ─── */
 .hero-caret {
+  /* Static brass terminal-bar. No blink — blinking contradicts the doctrine's
+     "calm, restrained engineering" tone. The bar arrives, settles, and waits.
+     This is appearance #3 of the accent (alongside CTA underline + hero-rule);
+     justified as the visual full-stop on the headline. */
   display: inline-block;
   width: 0.45em;
   height: 1em;
@@ -175,15 +179,10 @@
   background: var(--accent);
   vertical-align: -0.10em;
   opacity: 0;
-  /* Caret fades in after the headline finishes, blinks 5 times, then settles
-     visible. No infinite animation — that's main-thread + battery cost for
-     decoration. */
-  animation: caretIn 220ms var(--ease-out-quart) 740ms forwards,
-             caretBlink 1.2s steps(2) 900ms 5 forwards;
+  animation: caretIn 220ms var(--ease-out-quart) 740ms forwards;
   transform-origin: bottom center;
 }
 @keyframes caretIn { from { opacity: 0; transform: scaleY(0.5); } to { opacity: 1; transform: scaleY(1); } }
-@keyframes caretBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
 
 /* Reduced-motion path — collapse to opacity-only fades, no transforms.
    Selectors split so we never rely on source-order tiebreaking. */

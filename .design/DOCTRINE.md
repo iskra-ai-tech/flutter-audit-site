@@ -56,11 +56,23 @@ Hybrid of palette D (Ink & Nothing) + A (Graphite & Brass): the site is grayscal
 }
 ```
 
-**Where brass is allowed to appear** (and nowhere else):
-1. The 1px underline under the primary CTA button (resting state, full opacity).
-2. The hero's signature hairline rule (140px wide, 1px, just below the eyebrow tag).
+**Where brass is allowed to appear** — revised after P21 audit:
 
-That's it. Two appearances. Every other "color" decision is grayscale. This single restraint *is* the brand.
+*Primary surfaces (the "brand" appearances):*
+1. The 1px underline under every CTA button (`.cta::after`, `.form-submit::after`) — appearance #1.
+2. The hero's signature hairline rule (140px wide, 1px) — appearance #2.
+3. The hero terminal-caret — appearance #3 (the visual full-stop on the headline; integral to the 4-layer entrance).
+
+*Functional echoes (state-driven, derived from the primary surfaces):*
+- `.nav-brand::before` indicator dot (system status, not brand decoration).
+- `.faq-item[open] > summary::after` chevron color (open-state cue).
+- `.cta-secondary:hover` border-bottom + `.inline-magnet a:hover` border (link hover, derived from CTA underline).
+- `:focus-visible` ring on form inputs (focus state).
+- `::selection` highlight (browser chrome).
+
+The original "two appearances" rule was the right INSTINCT but mathematically wrong for a page with this many interactive surfaces. The revised rule: **three primary surfaces, with functional echoes permitted on state changes.** What this rules out: brass on body text, brass on borders, brass on backgrounds, brass on icons that aren't already part of a CTA gesture, brass on more than one chrome dot.
+
+P21's accent audit counted 5 primary surfaces; this revision recategorizes 2 of those (caret = primary, magnet-hover = functional echo) and the rest as functional. Discipline holds.
 
 ## 4. Typography doctrine
 

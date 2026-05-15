@@ -62,10 +62,18 @@ if (nav) {
   }
 }
 
-/* ─── 3: IntersectionObserver fallback for unsupported browsers ── */
-if (!supportsTimeline && !reduce) {
-  const reveals = document.querySelectorAll(".js-reveal");
-  if (reveals.length) {
+/* ─── 3: .js-reveal handling per scenario ─────────────────────
+   - reduce:               mark all visible immediately (no motion).
+   - !supportsTimeline:    IntersectionObserver on each element.
+   - supportsTimeline:     do NOT mark .is-in; let the @supports CSS keyframes
+                           run unimpeded (otherwise the static .is-in opacity
+                           fights the keyframe's 0→1 ramp and can flicker on
+                           fast scroll exits in Safari 18 TP). */
+const reveals = document.querySelectorAll(".js-reveal");
+if (reveals.length) {
+  if (reduce) {
+    reveals.forEach((r) => r.classList.add("is-in"));
+  } else if (!supportsTimeline) {
     const io = new IntersectionObserver((ents) => {
       ents.forEach((e) => {
         if (e.isIntersecting) {
@@ -76,10 +84,7 @@ if (!supportsTimeline && !reduce) {
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.05 });
     reveals.forEach((r) => io.observe(r));
   }
-}
-
-if (supportsTimeline || reduce) {
-  document.querySelectorAll(".js-reveal").forEach((r) => r.classList.add("is-in"));
+  /* supportsTimeline && !reduce → leave to CSS scroll-timeline */
 }
 
 /* ─── 4: Form honeypot + nicety + sticky CTA hide-when-form-in-view ── */
