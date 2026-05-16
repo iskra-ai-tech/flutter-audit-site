@@ -583,6 +583,105 @@ function setupPortraitCaption() {
   }, { rootMargin: "0% 0% -20% 0%", threshold: 0.2 }).observe(about);
 }
 
+/* ─────────────────────────────────────────────────────────────
+   10. SMOOTH IN-PAGE NAVIGATION
+   ─────────────────────────────────────────────────────────────
+   Every `<a href="#…">` is intercepted: we cancel the default jump,
+   run a custom rAF-eased scroll, and never touch the URL. The
+   easing is easeInOutQuint — soft entry, soft arrival, zero bounce.
+   Duration scales with distance so a one-section hop stays snappy
+   (~620ms) while a hero-to-form jump opens up to ~1300ms without
+   feeling sluggish. Any user wheel / touch / keyboard input cancels
+   the active animation so the page never fights the user. A hash
+   present on initial page load is stripped via replaceState so the
+   URL stays clean even on deep-link entries. */
+function setupSmoothScroll() {
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const PAD = 16;
+  const navH = () => {
+    const v = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-h"), 10);
+    return Number.isFinite(v) && v > 0 ? v : 64;
+  };
+  let raf = null;
+  let cancelOnInput = null;
+
+  const easeInOutQuint = (t) =>
+    t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+
+  function cancel() {
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    if (cancelOnInput) {
+      ["wheel", "touchstart", "keydown", "pointerdown"].forEach((ev) =>
+        window.removeEventListener(ev, cancelOnInput, { passive: true })
+      );
+      cancelOnInput = null;
+    }
+  }
+
+  function scrollToY(targetY) {
+    cancel();
+    const startY = window.scrollY;
+    const dist = targetY - startY;
+    if (Math.abs(dist) < 2) return;
+    if (REDUCED) { window.scrollTo(0, targetY); return; }
+    /* Distance-scaled duration. Small jumps stay snappy; long jumps
+       breathe. 0.55 ms/px gives the silky cadence; clamp keeps both
+       extremes pleasant. */
+    const duration = Math.min(1300, Math.max(620, Math.abs(dist) * 0.55));
+    const t0 = performance.now();
+    cancelOnInput = () => cancel();
+    ["wheel", "touchstart", "keydown", "pointerdown"].forEach((ev) =>
+      window.addEventListener(ev, cancelOnInput, { passive: true })
+    );
+    function step(now) {
+      const t = Math.min(1, (now - t0) / duration);
+      const y = startY + dist * easeInOutQuint(t);
+      window.scrollTo(0, y);
+      if (t < 1) raf = requestAnimationFrame(step);
+      else cancel();
+    }
+    raf = requestAnimationFrame(step);
+  }
+
+  function targetYFor(id) {
+    if (!id || id === "top") return 0;
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    return Math.max(0, rect.top + window.scrollY - navH() - PAD);
+  }
+
+  document.addEventListener("click", (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const href = a.getAttribute("href");
+    if (!href || href === "#") return;
+    const id = href.slice(1);
+    const y = targetYFor(id);
+    if (y === null) return; // unknown target — let the browser handle it
+    e.preventDefault();
+    scrollToY(y);
+    /* Move focus for keyboard / screen-reader users without scrolling
+       again. Programmatic tabindex lets non-focusable sections receive
+       focus exactly once. */
+    const focusTarget = id === "top" ? document.body : document.getElementById(id);
+    if (focusTarget && focusTarget !== document.body && focusTarget.getAttribute("tabindex") === null) {
+      focusTarget.setAttribute("tabindex", "-1");
+    }
+    if (focusTarget && typeof focusTarget.focus === "function") {
+      setTimeout(() => focusTarget.focus({ preventScroll: true }), 50);
+    }
+  });
+
+  /* Clean a hash off the URL if the page was deep-linked. The browser
+     has already scrolled there; we just hide the hash so subsequent
+     nav clicks don't see it either. */
+  if (location.hash && location.hash.length > 1) {
+    try { history.replaceState(null, "", location.pathname + location.search); } catch {}
+  }
+}
+
 /* ─── KICK OFF ───────────────────────────────────────────── */
 const run = () => {
   setupNav();
@@ -594,6 +693,7 @@ const run = () => {
   setupPortraitCaption();
   heroEntrance();
   setupReveals();
+  setupSmoothScroll();
 };
 
 if (document.readyState === "loading") {
