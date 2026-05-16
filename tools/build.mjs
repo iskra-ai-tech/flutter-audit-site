@@ -77,11 +77,16 @@ try {
 }
 css = minifyCss(css);
 
-// ── 2. Read & inline motion JS ────────────────────────────────
+// ── 2. Read & inline JS modules (concatenated, then minified) ─
 let js = "";
-const motionPath = join(SRC, "scripts", "motion.js");
-if (existsSync(motionPath)) {
-  js = await readFile(motionPath, "utf8");
+const jsOrder = ["motion.js", "checklist-anim.js"];
+const jsParts = [];
+for (const name of jsOrder) {
+  const p = join(SRC, "scripts", name);
+  if (existsSync(p)) jsParts.push(await readFile(p, "utf8"));
+}
+if (jsParts.length) {
+  js = jsParts.join("\n;\n");
   try {
     const terser = await import("terser");
     const out = await terser.minify(js, { module: true, compress: { passes: 2 }, mangle: true, ecma: 2022 });

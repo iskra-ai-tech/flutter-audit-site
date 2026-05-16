@@ -149,9 +149,9 @@
         { "@type": "Question", "name": "Do you need the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The audit is me reading your code. Walkthroughs, screen-shares, and recordings are not substitutes — the diagnosis lives in the repo. NDA before code changes hands." } },
         { "@type": "Question", "name": "Why $500 — is this a real audit at that price?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. You are paying for diagnostic compression: three days of a senior engineer reading the codebase end to end, plus a ranked fix list bound to file and line, a real-device frame timeline, a stakeholder brief, and a walkthrough with your team. Senior contractor day rates run $1,200–$2,400. The audit prices under day-rate × 3 because the deliverable is bounded — diagnosis, not implementation." } },
         { "@type": "Question", "name": "Our app is not slow — it is just messy. Is the audit still useful?", "acceptedAnswer": { "@type": "Answer", "text": "Often more so. Performance audits get the headlines; architectural audits change quarters. If your team is touching eight files for a one-field change, you have a coupling problem — same audit, different probe set: churn × complexity hotspots, dependency staleness, mutation score on the domain core, ghost-code archaeology, half-finished migrations." } },
-        { "@type": "Question", "name": "How is this different from flutter analyze or a code-quality SaaS?", "acceptedAnswer": { "@type": "Answer", "text": "flutter analyze tells you what is syntactically wrong. Code-quality SaaS tells you what is statistically unusual. The audit tells you what is structurally wrong — which decision, which subtree, which dependency, on which device. A linter sees tokens. I read pipelines." } },
+        { "@type": "Question", "name": "How is this different from automated code-quality tools?", "acceptedAnswer": { "@type": "Answer", "text": "Automated tools tell you what is syntactically wrong or statistically unusual. The audit tells you what is structurally wrong — which decision, which screen, which dependency, on which device. Tools see code. The audit sees decisions, and the cost of leaving them in place." } },
         { "@type": "Question", "name": "What if the problem is too big for a 3-day audit?", "acceptedAnswer": { "@type": "Answer", "text": "Day 2 is a hard checkpoint. If the diagnosis has not bound your symptom to a named engine-level cause by then, you get the partial trace and a full refund. If your problem genuinely needs ten engineer-days, the Day-2 report says so with the scoped follow-on." } },
-        { "@type": "Question", "name": "Do you do the fixes too?", "acceptedAnswer": { "@type": "Answer", "text": "The audit is the product. Your engineers typically ship the fix list faster than I would. For specialist work — custom Impeller-compatible shader, vector_math_64 gesture rewrite, Impeller-Vulkan PSO warmup harness, large-scale state-management migration — I take implementation engagements after the audit, scoped per item." } },
+        { "@type": "Question", "name": "Do you do the fixes too?", "acceptedAnswer": { "@type": "Answer", "text": "The audit is the product. Your engineers typically ship the fix list faster than I would. For specialist work — custom rendering, large gesture rewrites, a complex migration off a legacy state library — I take implementation engagements after the audit, scoped per item." } },
         { "@type": "Question", "name": "Do you handle legacy Flutter codebases?", "acceptedAnswer": { "@type": "Answer", "text": "That is most of the work. Half-migrated null safety, v1 Android embedding holdouts, Material 2 surfaces under a Material 3 root, abandoned isolates, three state-management libraries in one repo, dependencies frozen since 2023. The audit ends with a sequenced migration plan, every step bound to a regression test." } }
       ]
     }
@@ -307,102 +307,223 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════
-     3b. CHECKLIST — ten engine-level fronts opened in every audit.
-          Symptom (CTO voice) → engine cause → diagnostic → test that
-          bounds the regression. Read on the page, no email required.
+     3b. CHECKLIST — ten dropdowns, each opens with a physics-
+          driven multi-layer animation (see checklist-anim.js).
+          Copy is written for CEO / PM / head-of-eng audiences;
+          the technical depth lives inside the audit deliverable,
+          not on this page.
      ═══════════════════════════════════════════════════════════ -->
 <section class="section" id="checklist" aria-labelledby="cl-h">
   <div class="page">
     <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">02b</span>&nbsp;Read on the page · ten fronts</p>
       <h2 id="cl-h"><span class="lw">What the audit actually opens.</span></h2>
-      <p class="lede muted">Ten engine-level fronts I open against every Flutter codebase. Your symptom binds to one of these — usually two. Each front lists the diagnostic that proves the cause and the test that holds the fix in place after I leave. Public on purpose; if your team is already running every probe below cleanly, you do not need me.</p>
+      <p class="lede muted">Ten fronts I open against every Flutter codebase. Your symptom binds to one of these &mdash; usually two. Tap any to see what the front is and how the audit closes it.</p>
     </header>
 
-    <ol class="checklist">
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">01</div>
-        <div>
-          <h3>Cold start to first interactive frame &mdash; not first paint.</h3>
-          <p class="cl-symptom"><em>&ldquo;Install funnel drops 12% between download and first session. Competitors open instantly. Ours sits, flashes white, content fades in.&rdquo;</em></p>
-          <p>TTI is the budget that matters, not first paint. The kill is almost always upstream of <code>runApp</code> &mdash; synchronous Firebase init, plugin chains hanging off <code>Application.onCreate</code>, eager <code>SharedPreferences</code>, lazy AOT snapshot mmap stalls. Diagnosed with <code>adb shell am start -W -S -R 5</code> + a Perfetto trace bracketing <code>FlutterEngine</code> ctor and <code>Dart_LoadScriptFromKernel</code>. <code>FlutterEngineGroup</code> pre-warm on a worker thread reliably reclaims 200&ndash;400 ms on mid-tier Android. Bound by an <code>integration_test</code> that fails CI if <code>timeToFirstFrameRasterizedMicros &gt; 800,000</code> on a Firebase Test Lab Pixel 7 &mdash; the test stays in the suite as a permanent regression bound.</p>
-        </div>
+    <ol class="checklist" data-checklist>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">01</span>
+            <h3 class="cl-title">Cold start to first interactive screen.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Users decide whether your app is good or broken in the first two seconds. Install funnels lose double-digit percentages when an app feels slow to open &mdash; the cost is paid before anyone sees a feature.</p>
+              <p style="--i:1">We measure exactly where the time goes between the icon tap and the first screen your team can call &ldquo;ready,&rdquo; on the mid-tier phones your real customers use. The result is a budget the engineering team can defend in every release.</p>
+              <p style="--i:2">Most of the savings sit outside the visible interface, in plumbing your team didn&rsquo;t think to look at.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">02</div>
-        <div>
-          <h3>Splash &rarr; content visual continuity.</h3>
-          <p class="cl-symptom"><em>&ldquo;There&rsquo;s a beat where the icon sits, then the screen flashes white, then content fades in. Feels broken.&rdquo;</em></p>
-          <p>Three frames are involved: OS splash (Android 12+ <code>windowSplashScreenAnimatedIcon</code>, iOS <code>LaunchScreen.storyboard</code>), Flutter&rsquo;s first Dart frame (usually a blank <code>Scaffold</code> at <code>colorScheme.surface</code>), then real content as routes hydrate. The flash is the frame 0 &rarr; 1 discontinuity. Audited by capturing the first ten frames into a per-frame golden set on a pinned device. Fix: pixel-match the native splash drawable to the first <code>Scaffold</code> background, then gate <code>deferFirstFrame()</code> / <code>allowFirstFrame()</code> around <code>precacheImage</code> of the route&rsquo;s load-bearing assets. Bound by a triple-frame golden test on Pixel 8a + iPhone 13 that fails any PR shifting the cold-launch optics.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">02</span>
+            <h3 class="cl-title">Splash and first-impression continuity.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Most apps reveal themselves in three frames: the launch icon, a loading placeholder, and the real content. When those three don&rsquo;t line up visually, users feel a flicker &mdash; and a flicker reads as &ldquo;broken&rdquo; even when the app is technically fast.</p>
+              <p style="--i:1">We measure and tune the transition on real devices so the open looks continuous on every screen class your customers carry. The first impression is the only one that&rsquo;s free.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">03</div>
-        <div>
-          <h3>Image pipeline GPU texture residency.</h3>
-          <p class="cl-symptom"><em>&ldquo;App crashes after scrolling a 200-item gallery twice. iOS jetsam, Android low-memory-killer. We&rsquo;re using <code>cached_network_image</code>, so we thought we were fine.&rdquo;</em></p>
-          <p><code>ImageCache</code> has two budgets &mdash; count (default 1000) and bytes (default 100 MB). But a decoded <code>ui.Image</code> is a GPU texture handle, and Impeller&rsquo;s texture atlas runs its own LRU independent of <code>imageCache.evict()</code>. Without <code>cacheWidth</code>/<code>cacheHeight</code> matched to logical pixels &times; <code>devicePixelRatio</code>, a 4000&times;3000 JPEG decodes to a 48 MB RGBA8 texture &mdash; ten of those is half a gig of GPU memory the Dart side cannot evict. Diagnosed with <code>adb shell dumpsys meminfo</code> (Graphics line) + DevTools Memory live <code>ui.Image</code> count + <code>didHaveMemoryPressure</code> callback wiring. Bound by an <code>integration_test</code> scrolling the gallery 5&times; with a monotonic-growth assertion on the Graphics line.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">03</span>
+            <h3 class="cl-title">How images are stored and held in memory.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Image-heavy screens are the most common cause of crashes that never reach your dashboard, because the phone silently kills the app when memory runs out. The user sees a relaunch; you see nothing.</p>
+              <p style="--i:1">We trace where every photo is loaded, decoded, and held onto, and shrink the footprint so the same screens hold up on phones half your team would never test on.</p>
+              <p style="--i:2">The fix is rarely a new library. Usually it&rsquo;s two settings nobody knew were defaults &mdash; and the user-visible result is the app feeling lighter on the devices your retention curve actually depends on.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">04</div>
-        <div>
-          <h3>Frame budget split: UI thread vs raster thread.</h3>
-          <p class="cl-symptom"><em>&ldquo;DevTools claims 120 fps but the iPhone still feels stuttery. We can&rsquo;t see what&rsquo;s wrong.&rdquo;</em></p>
-          <p>At 120 Hz the 8.33 ms budget is two parallel budgets, not a sum. <code>SchedulerBinding.addTimingsCallback</code> surfaces <code>buildDuration</code> and <code>rasterDuration</code> as independent phases. A <code>SaveLayer</code>-heavy subtree (<code>Opacity</code>, <code>BackdropFilter</code>, <code>ShaderMask</code>, scaled <code>Transform</code>) inflates raster while UI looks pristine &mdash; each <code>SaveLayer</code> becomes an <code>EntityPass</code> with its own render target, and one nested <code>BackdropFilter</code> inside another can produce quadratic intermediate-texture cost. Ship p99 raster as a separate SLI to your APM via <code>FrameTiming</code> sampling. Bound by an <code>integration_test</code> driving a scripted scroll under <code>binding.traceAction</code> asserting <code>90th_percentile_frame_rasterizer_time_millis &lt; 8.0</code> and <code>missed_frame_rasterizer_budget_count == 0</code>.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">04</span>
+            <h3 class="cl-title">Why the app can feel slow when the dashboard says it isn&rsquo;t.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">There are two clocks running inside every frame, not one: the work to compose the screen, and the work to actually draw it. Most teams only watch the first.</p>
+              <p style="--i:1">When the second clock is the one over-budget, the dashboard looks healthy and the phone still feels stuttery &mdash; and users can&rsquo;t articulate why, they just sense it.</p>
+              <p style="--i:2">We measure both clocks separately on real devices and tell you which one your team&rsquo;s engineering hours should be aimed at. It&rsquo;s almost never the one being measured today.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">05</div>
-        <div>
-          <h3>App size as install-conversion lever.</h3>
-          <p class="cl-symptom"><em>&ldquo;Install conversion in India is half what we see in the US. Users see &lsquo;47 MB&rsquo; on the Play Store and bounce. Updates have a 40% lower opt-in rate than peers.&rdquo;</em></p>
-          <p>Mid-tier Android math: every +1 MB over 30 MB drops install conversion roughly one percentage point. The 2026 audit signal hiding in plain sight: Material Symbols variable font silently defeats <code>--tree-shake-icons</code> because tree-shake walks const <code>IconData</code> call sites and the variable axes defeat per-glyph elimination &mdash; teams migrating from Material Icons to Symbols ship 2 MB of unreferenced glyphs and never notice. Audited via <code>flutter build appbundle --analyze-size</code> + <code>bundletool get-size total</code>. Recovery in order: <code>--split-debug-info --obfuscate</code> (~30% off <code>libapp.so</code>), R8 fullMode reinstated, density variant pruning, subsetted icon font, deferred components for once-per-lifetime flows. Bound by a CI size-budget gate that fails any PR exceeding the budget with an attributable treemap diff posted to the PR.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">05</span>
+            <h3 class="cl-title">App size and install conversion.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Every megabyte over thirty drops install conversion in the markets you most want to grow into. Users on prepaid data plans see the size on the store page and tap back &mdash; you never see them.</p>
+              <p style="--i:1">We open the app&rsquo;s package byte by byte, name what&rsquo;s inside, and rank the three changes that recover the most install share with the least engineering risk.</p>
+              <p style="--i:2">One of them is usually a single setting nobody noticed had reverted during a release. Smaller app, more installs, same product.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">06</div>
-        <div>
-          <h3>Battery and thermal pressure on real devices.</h3>
-          <p class="cl-symptom"><em>&ldquo;Users complain the app heats the phone. App Store reviews mention battery drain. We have no idea what&rsquo;s burning.&rdquo;</em></p>
-          <p>The render loop is itself an energy line. Over-invalidation on a 120 Hz idle screen sits at ~8% CPU and noticeable mW; a parked Ticker is ~0.5%. Location accuracy tiers fan out by an order of magnitude &mdash; <code>high</code> (~80 mW continuous) vs <code>passive</code> (~2 mW). Background work coalescing through <code>WorkManager</code> / <code>BGTaskScheduler</code>, radio-tail cost on network polling, BLE/sensor wake patterns &mdash; each one is a measurable line. Thermal headroom (<code>getThermalHeadroom()</code>, iOS <code>ProcessInfo.thermalState</code>) reveals when the SoC starts throttling and Flutter&rsquo;s raster degrades. Diagnosed with Android Energy Profiler + Battery Historian; CI-bound via a Monsoon rig or instrumented Firebase Test Lab spec asserting per-route mW budgets.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">06</span>
+            <h3 class="cl-title">Battery drain and device heating.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Reviews mentioning battery cost you more than reviews mentioning missing features &mdash; and they&rsquo;re harder to recover from, because most users don&rsquo;t leave a review, they just delete the app.</p>
+              <p style="--i:1">We measure where the app actually draws power on real devices, ranked and broken down by screen and feature, so engineering can target the largest line first.</p>
+              <p style="--i:2">Background work, location accuracy, and over-eager screen refresh are the usual three offenders. Battery is the quiet retention story behind almost every uninstall spike.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">07</div>
-        <div>
-          <h3>Memory leaks and soak degradation.</h3>
-          <p class="cl-symptom"><em>&ldquo;Long sessions feel heavier. After 30 minutes of normal use the frame rate drifts down; iOS eventually jetsams.&rdquo;</em></p>
-          <p><code>package:leak_tracker</code> (now integrated into <code>flutter_test</code>) detects three leak classes: not-disposed, not-GCed-after-disposed, GCed-late. Canonical 2026 offenders unchanged in shape: <code>AnimationController</code> without <code>dispose</code>, <code>StreamSubscription</code> from <code>Stream.listen()</code> never cancelled, <code>TextEditingController</code>/<code>ScrollController</code>/<code>FocusNode</code> silent leaks, <code>GestureRecognizer</code> constructed in <code>build()</code>. Heap snapshot diff between two scenario boundaries names the retained class; DevTools Memory &rarr; Leaks tab emits the retention-path JSON. Bound by every widget test enabling <code>LeakTesting.settings.withTracked(allNotDisposed: true)</code> + a 5-minute soak <code>integration_test</code> asserting heap-growth slope ~ 0 across a scripted user journey.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">07</span>
+            <h3 class="cl-title">Long-session memory drift.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Some apps feel heavier the longer they&rsquo;re used and quietly crash after twenty minutes. That pattern doesn&rsquo;t show up in dashboards, doesn&rsquo;t reproduce in QA, and is almost always a small piece of code that fails to release something it should.</p>
+              <p style="--i:1">We run scripted long-session scenarios, watch the memory curve, and identify exactly what&rsquo;s accumulating &mdash; the same way a financial auditor traces a line item back to its source entry.</p>
+              <p style="--i:2">Long-session reliability is what separates an app that gets opened daily and one that gets deleted on Sunday.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">08</div>
-        <div>
-          <h3>Concurrency correctness in Dart 3.</h3>
-          <p class="cl-symptom"><em>&ldquo;Random null deref under heavy network. We patched it. It came back two releases later with a different stack.&rdquo;</em></p>
-          <p><code>compute()</code> is no longer the right primitive &mdash; <code>Isolate.run</code> with Isolate Groups and <code>TransferableTypedData</code> is the Dart 3 path, with shared-heap semantics that change what&rsquo;s safe to pass. Real failure modes: microtask starvation of the gesture arbiter under a runaway <code>await</code> chain inside a Stream listener, double-fetch races on rebuild without <code>CancelableOperation</code>, Stream backpressure under <code>asyncMap</code> vs <code>switchMap</code> ordering. Diagnosed with <code>dart:developer Timeline</code> slices + DevTools async-aware stack traces + VM Service <code>getAllocationProfile</code>. Bound by deterministic <code>fake_async</code> scheduler tests + property-based <code>glados</code> tests generating adversarial input sequences against the concurrency invariant.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">08</span>
+            <h3 class="cl-title">Bugs that come back two releases later.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">The hardest bug to fix is the one that returns under a different stack trace. Most of those are timing-related &mdash; two parts of the app racing each other under load or on unusual user paths &mdash; and they need a different kind of investigation than a normal crash.</p>
+              <p style="--i:1">We follow those paths through detailed logs and reproduce the failure on demand, then prove the fix holds so it doesn&rsquo;t reappear in a future release.</p>
+              <p style="--i:2">A bug that recurs is more expensive than a new one because trust compounds, both inside the team and with users.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">09</div>
-        <div>
-          <h3>Technical debt + legacy code archaeology.</h3>
-          <p class="cl-symptom"><em>&ldquo;Adding one feature touches eight files. Velocity is half what it was a year ago. We have three state-management libraries because three engineers each had a favourite.&rdquo;</em></p>
-          <p>Five quantifiable decay signals: state-management library count &gt; 1, navigation library count &gt; 1, theme literals outside the token system, custom widget files &gt; 200 LOC, dependency versions frozen &gt; 18 months. Churn &times; complexity hotspots (Tornhill applied to a Flutter tree) name the five files responsible for 60% of regression incidents. Legacy migration risk surfaces as null-safety partial migrations still in flight, v1 Android embedding holdouts, Material 2 &rarr; 3 incomplete sweeps, Impeller opt-out flags still set, abandoned isolates running dead code paths. Tooling: <code>dart analyze --fatal-infos</code>, <code>dcm</code>, <code>pana</code>, <code>osv-scanner</code>, custom AST visitors for project-specific anti-patterns. Bound by mutation score on the domain core (target &gt; 70% via <code>mutation_test</code>) and a <code>regression-bounds/</code> directory of permanent test guards each pinned to a closed ticket.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">09</span>
+            <h3 class="cl-title">Codebase decay and legacy debt.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Codebases drift the moment teams change. A library that was the right choice in 2023, a migration that started and stalled, a feature flag nobody flipped, a dependency frozen because everyone is afraid to update it &mdash; each one is a small tax, and your team is paying all of them at once.</p>
+              <p style="--i:1">We map every line of decay, weigh the cost in engineering hours, and hand back a sequenced plan to pay it down without freezing your roadmap.</p>
+              <p style="--i:2">Most teams overestimate the cost of fixing legacy code and underestimate the daily cost of not.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
-      <li data-reveal data-reveal-group="checklist">
-        <div class="cl-num">10</div>
-        <div>
-          <h3>Bug detection where the test is the proof.</h3>
-          <p class="cl-symptom"><em>&ldquo;We close bugs and they come back. QA finds it, the engineer says &lsquo;fixed,&rsquo; it ships, two releases later the same crash with a different stack. We have 78% line coverage and zero regression confidence.&rdquo;</em></p>
-          <p>Coverage is not proof &mdash; a thousand <code>expect(true, true)</code> tests show 100% coverage and 0% proof. Audit methodology: every reported issue produces a failing reproducer <em>first</em>, committed before the fix. The fix lands in the same PR that flips the test red &rarr; green. The test stays in the suite as a permanent regression bound. Diagnostic substrate: structured NDJSON logs with correlation IDs surviving across isolate boundaries, replayable from a captured production trace. Test taxonomy mapped to proof type: unit (pure logic), widget (with rebuild-count assertion), <code>integration_test</code> (with <code>FrameTiming</code> assertion), golden (platform-pinned), property-based (<code>glados</code>), mutation (<code>mutation_test</code>), soak (heap-slope), telemetry-replay. The audit deliverable is not a PDF of opinions &mdash; it is a series of red-to-green commits, each one a permanent guard, replayable by anyone with a checkout.</p>
-        </div>
+      <li>
+        <details class="cl-item" data-cl-item>
+          <summary class="cl-summary">
+            <span class="cl-num">10</span>
+            <h3 class="cl-title">Bugs that don&rsquo;t come back.</h3>
+            <span class="cl-chevron" aria-hidden="true">
+              <svg viewBox="0 0 14 14"><path d="M3 5l4 4 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </summary>
+          <div class="cl-body">
+            <div class="cl-body-inner">
+              <p style="--i:0">Most audits hand back a PDF of opinions. This audit hands back a sequence of tests &mdash; one per finding &mdash; that prove the issue exists, document the fix, and stay in your test suite forever as a permanent guard against the same bug returning.</p>
+              <p style="--i:1">Your team&rsquo;s engineers can re-run every claim in the report. Nothing is taken on faith.</p>
+              <p style="--i:2">The audit is the deliverable. The tests are the receipt.</p>
+            </div>
+          </div>
+        </details>
+        <span class="cl-shimmer" aria-hidden="true"></span>
+        <span class="cl-scribe" aria-hidden="true"></span>
       </li>
     </ol>
 
-    <p class="checklist-foot meta">If two or more of these probes fire dirty against your codebase, the audit usually pays for itself in the first PR your team doesn&rsquo;t have to write twice.</p>
+    <p class="checklist-foot meta">If two or more of these fronts fire dirty against your codebase, the audit usually pays for itself in the first PR your team doesn&rsquo;t have to write twice.</p>
   </div>
 </section>
 
@@ -417,8 +538,8 @@
     </header>
 
     <div class="philosophy" data-reveal>
-      <p>A code review tells you what is syntactically wrong. An audit tells you what is structurally wrong. Which decision from 2023 is costing a week per release. Which <code>SaveLayer</code> ancestor is taxing every animated frame. Which third of your providers can be deleted without anyone noticing. Which migration started in 2024 and never finished.</p>
-      <p>A linter sees tokens; the audit sees decisions. I trace narrow error-prone paths through structured logs and engine timelines until the symptom binds to a named cause &mdash; over-invalidation, image-pipeline residency, Impeller PSO miss, isolate starvation, ghost rebuild. Every claim in the deliverable lands as a failing test first, then a green one. Diagnosis is the hard part. The fix list is short on purpose. Most of the value is what is no longer there.</p>
+      <p>A code review tells you what is syntactically wrong. An audit tells you what is structurally wrong. Which decision from 2023 is costing a week per release. Which animation is taxing every screen and nobody has time to fix. Which third of your codebase can be deleted without anyone noticing. Which migration started in 2024 and never finished.</p>
+      <p>The audit reads decisions, not code. I trace narrow, error-prone paths through detailed logs and real-device measurements until your symptom is bound to one named cause &mdash; not a list of guesses. Every claim in the deliverable is proved by a failing test before the fix, and a passing one after. Diagnosis is the hard part. The fix list is short on purpose. Most of the value is what is no longer there.</p>
     </div>
   </div>
 </section>
@@ -453,7 +574,7 @@
         <div class="process-day">DAY 2</div>
         <div>
           <h3>Profiling on real devices.</h3>
-          <p>Real-device <code>FrameTiming</code> captured from <code>addTimingsCallback</code>, UI vs raster thread split, <code>leak_tracker</code> pass over critical routes, AAB size mapped via <code>bundletool</code>, cold-start traced from process spawn to first interactive frame, battery line sampled per route. Your symptom binds to a named engine-level cause &mdash; over-invalidation, <code>SaveLayer</code> storm, Impeller-Vulkan PSO miss, image-pipeline residency, isolate starvation, or something more specific.</p>
+          <p>Real-device measurement of every front: how each screen renders frame by frame, where memory is held and released, what the app does to the battery, how long the open takes, what each megabyte of size is paying for. Your symptom is bound to one named cause by close of day &mdash; not a list of suspects, not a backlog of guesses.</p>
         </div>
       </div>
       <div class="process-step" data-reveal data-reveal-group="process">
@@ -532,8 +653,8 @@
         <div><p>Often more so. Performance audits get the headlines; architectural audits change quarters. If your team is touching eight files for a one-field change, you do not have a performance problem, you have a coupling problem — same audit, different probe set: churn × complexity hotspots, dependency staleness, mutation score on the domain core, ghost-code archaeology, half-finished migrations.</p></div>
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
-        <summary>How is this different from <code>flutter analyze</code> or a code-quality SaaS?</summary>
-        <div><p><code>flutter analyze</code> tells you what is syntactically wrong. Code-quality SaaS tells you what is statistically unusual. The audit tells you what is structurally wrong — which decision, which subtree, which dependency, on which device. A linter sees tokens. I read pipelines.</p></div>
+        <summary>How is this different from automated code-quality tools?</summary>
+        <div><p>Automated tools tell you what is syntactically wrong or statistically unusual. The audit tells you what is structurally wrong &mdash; which decision, which screen, which dependency, on which device. Tools see code. The audit sees decisions, and the cost of leaving them in place.</p></div>
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>What if the problem is too big for a 3-day audit?</summary>
@@ -541,7 +662,7 @@
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Do you do the fixes too?</summary>
-        <div><p>The audit is the product. Your engineers typically ship the fix list faster than I would — the audit names the file and the line, and the team learns the codebase along the way. For specialist work (custom Impeller-compatible shader, <code>vector_math_64</code> gesture rewrite, Impeller-Vulkan PSO warmup harness, large-scale state-management migration) I take implementation engagements after the audit, scoped per item.</p></div>
+        <div><p>The audit is the product. Your engineers typically ship the fix list faster than I would &mdash; the audit names the file and the line, and the team learns the codebase along the way. For specialist work &mdash; custom rendering, large gesture rewrites, a complex migration off a legacy state library &mdash; I take implementation engagements after the audit, scoped per item.</p></div>
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Do you handle legacy Flutter codebases?</summary>
@@ -574,8 +695,8 @@
         </figcaption>
       </figure>
       <div class="about-body stack-lg" data-reveal>
-        <p>I am a senior Flutter engineer. The last several years have been spent reading, debugging, and unsticking Flutter apps in production: scrolling that drops frames on flagship phones, custom animations that have to look correct on a Pixel 3a, gesture systems that hold up at 120 Hz on iPad Pro, legacy codebases with three state-management libraries that nobody wants to touch. I work in <code>vector_math_64</code>. I write Impeller-compatible fragment shaders when the off-the-shelf paint will not hold the frame budget. I read Perfetto and <code>FrameTiming</code> when stuck — usually the fastest way out.</p>
-        <p><strong>How I work:</strong> I trace narrow, error-prone paths through structured NDJSON logs and engine timelines until the symptom binds to a named cause — over-invalidation, <code>SaveLayer</code> storm, Impeller-Vulkan PSO miss, image-pipeline residency, isolate starvation, leaked <code>StreamSubscription</code>, ghost rebuild from an over-broadcasting provider. Every claim in the deliverable lands as a failing test first, then a green one. The test stays in your suite as a permanent regression bound after I leave.</p>
+        <p>I am a senior Flutter engineer. The last several years have been spent reading, debugging, and unsticking Flutter apps in production &mdash; scrolling that drops frames on flagship phones, custom animations that have to look correct on a five-year-old Android, gesture work at 120 Hz, legacy codebases with three state-management libraries layered on top of each other that nobody on the current team wants to touch. I write custom rendering when the off-the-shelf path won&rsquo;t hold the frame budget. I read frame-by-frame measurements when stuck &mdash; usually the fastest way out.</p>
+        <p><strong>How I work:</strong> I trace narrow, error-prone paths through detailed logs and real-device measurements until your symptom is bound to one named cause &mdash; not a list of suspects. Every claim in the deliverable lands as a failing test first and a passing one after. The test stays in your suite as a permanent regression guard after I leave, so the same bug cannot quietly return in a future release.</p>
         <p><strong>What that means for you:</strong> when your app feels slow, heats the phone, leaks across long sessions, or just resists changes, I usually name the cause inside a day and bind it to a file and a line by end of Day 2. Legacy archaeology, half-finished migrations, abandoned isolates, the dependency that has been frozen since 2023 — same probe set, different findings. Diagnosis is the hard part. The fix is usually short.</p>
         <p>I take one audit at a time. That is the whole business. No agency, no team, no handoffs, no junior doing the work. If you book the audit, you get me.</p>
       </div>
