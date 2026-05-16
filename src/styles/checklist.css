@@ -1,24 +1,44 @@
 /* ============================================================
-   Checklist v3 — browser-compositor-native dropdowns.
+   Checklist v4 — liquid disclosure engine.
    ─────────────────────────────────────────────────────────
-   Architecture: CSS state-based transitions drive every layer
-   except shimmer + scribe (WAAPI, also composite-thread). No
-   per-frame JS, no rAF, no CSS custom-property writes during
-   animation. The browser interpolates each property once per
-   state change with a single optimized timeline.
+   This stylesheet is the visual scaffold for a 7-layer
+   physics-orchestrated dropdown. JS (checklist-anim.js) owns
+   the master clock (spring height) and fires one-shot WAAPI
+   animations on each FX element. CSS owns the resting state,
+   the [open] target state, hover transitions, and the glyph
+   wave (CSS transitions tied to --gx).
 
-   Easing palette (taste-tested for "spring without overshoot
-   nausea"):
-     - Hover scale     cubic-bezier(0.34, 1.4, 0.5, 1)   280ms
-     - Disclosure h    cubic-bezier(0.16, 1, 0.3, 1)     460ms
-     - Chevron rotate  cubic-bezier(0.34, 1.56, 0.64, 1) 420ms
-     - Color/shadow    cubic-bezier(0.4, 0, 0.2, 1)      320ms
+   Layers (z-order, low to high):
+     0. .cl-item base (background, border, shadow, hover tilt)
+     1. .cl-fx-aurora        radial bloom from chevron
+     2. .cl-fx-ring (×3)     concentric expansion rings
+     3. .cl-fx-shimmer-band  RGB-offset diagonal sweeps
+     4. .cl-fx-border        conic-gradient orbiting border
+     5. .cl-fx-scribe        top-edge laser sweep
+     6. summary/body content
+
+   Pointer interaction: --mx / --my are normalized [-1..1]
+   driven by checklist-anim.js (rAF spring loop while hovered).
+   They feed a radial-highlight gradient and a micro-tilt.
    ============================================================ */
 
-/* Enable native height: auto ↔ 0 transition (Chromium 129+, FF 139+).
-   Safari falls back to JS measurement in checklist-anim.js. */
-@supports (interpolate-size: allow-keywords) {
-  html { interpolate-size: allow-keywords; }
+/* Registered custom property so WAAPI can interpolate it on the
+   compositor (without registration, browsers treat it as a
+   string token and snap between frames). */
+@property --be-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --mx {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+@property --my {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
 }
 
 .checklist {
@@ -28,13 +48,17 @@
   display: grid;
   gap: var(--s-3);
 }
-
 .checklist > li {
   position: relative;
   list-style: none;
 }
 
-/* ── Item base ────────────────────────────────────────────────── */
+/* ── Item base ────────────────────────────────────────────────
+   The card itself. transform-style: preserve-3d enables the
+   pointer-driven micro-tilt without losing subpixel precision.
+   Hover scale + lift use a slight overshoot bezier to read as
+   a spring rather than a CSS ramp.
+*/
 .cl-item {
   position: relative;
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 100%);
@@ -43,71 +67,241 @@
   overflow: hidden;
   isolation: isolate;
   transform-origin: center top;
+  transform-style: preserve-3d;
+  perspective: 1200px;
   box-shadow: 0 0 0 0 oklch(0.74 0.09 85 / 0);
+  --mx: 0;
+  --my: 0;
 
-  /* Hover scale + lift use a spring-shape cubic-bezier (subtle
-     overshoot to read as physics, not as a CSS ramp). */
   transition:
-    transform   280ms cubic-bezier(0.34, 1.4, 0.5, 1),
-    border-color 320ms cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow   320ms cubic-bezier(0.4, 0, 0.2, 1),
-    background   320ms cubic-bezier(0.4, 0, 0.2, 1);
+    transform   320ms cubic-bezier(0.34, 1.42, 0.5, 1),
+    border-color 360ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow   360ms cubic-bezier(0.4, 0, 0.2, 1),
+    background   360ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Hover only on collapsed items — opening overrides hover. */
-.cl-item:not([open]):hover {
-  transform: scale(1.014) translateY(-2px);
-  border-color: color-mix(in oklab, var(--hairline) 45%, var(--accent));
+/* Hover (collapsed): subtle lift + scale + pointer-driven 3D tilt.
+   The tilt magnitude is capped at ~1.4deg to stay tasteful at
+   close range. Translation is in z to compose with the spring. */
+.cl-item:not([open]):hover,
+.cl-item:not([open]).cl-hovered {
+  transform:
+    perspective(1200px)
+    rotateX(calc(var(--my) * -1.4deg))
+    rotateY(calc(var(--mx) * 1.4deg))
+    scale(1.014)
+    translateY(-2px);
+  border-color: color-mix(in oklab, var(--hairline) 35%, var(--accent));
   box-shadow:
-    0 1px 0 oklch(0.74 0.09 85 / 0.04),
-    0 12px 28px -16px oklch(0.74 0.09 85 / 0.18);
+    0 1px 0 oklch(0.74 0.09 85 / 0.05),
+    0 14px 32px -18px oklch(0.74 0.09 85 / 0.22),
+    0 4px 10px -6px oklch(0.74 0.09 85 / 0.12);
 }
 
 .cl-item[open] {
-  border-color: color-mix(in oklab, var(--hairline) 30%, var(--accent));
+  border-color: color-mix(in oklab, var(--hairline) 25%, var(--accent));
   background: linear-gradient(180deg,
     var(--bg) 0%,
-    color-mix(in oklab, var(--bg-elevated) 80%, var(--accent) 4%) 100%);
+    color-mix(in oklab, var(--bg-elevated) 78%, var(--accent) 5%) 100%);
   box-shadow:
-    0 1px 0 oklch(0.74 0.09 85 / 0.06),
-    0 14px 36px -18px oklch(0.74 0.09 85 / 0.24);
+    0 1px 0 oklch(0.74 0.09 85 / 0.07),
+    0 16px 40px -18px oklch(0.74 0.09 85 / 0.28);
 }
 
-/* ── Body — native ::details-content where supported ─────────── */
-/* Pseudo-element path: Chromium 131+, FF 139+, Safari 18.4+ all
-   support ::details-content. Combined with `interpolate-size` on
-   :root, height: 0 ↔ auto transitions on the compositor. */
+/* ── ::details-content override ───────────────────────────────
+   Native UA stylesheet hides non-summary children when details
+   is closed. We force-render so the FX layers (aurora, rings,
+   shimmer, border-energy, scribe) live inside <details> but
+   remain visible regardless of open state. Our own .cl-body
+   handles the actual collapse via JS-owned height.
+*/
 .cl-item::details-content {
-  block-size: 0;
-  overflow: clip;
-  opacity: 0;
-  transition:
-    block-size 460ms cubic-bezier(0.16, 1, 0.3, 1),
-    opacity    320ms cubic-bezier(0.4, 0, 0.2, 1) 80ms,
-    content-visibility 460ms allow-discrete;
-}
-.cl-item[open]::details-content {
+  content-visibility: visible;
   block-size: auto;
+  overflow: visible;
+  opacity: 1;
+  transition: none;
+}
+
+/* ── Body — JS-owned height container ─────────────────────── */
+.cl-body {
+  overflow: clip;
+  height: 0;            /* JS overrides via WAAPI */
+  position: relative;
+  z-index: 2;
+  will-change: height;
+}
+.cl-item[open] .cl-body {
+  /* JS animates to a measured px target then sets back to auto. */
+}
+
+/* ── Pointer-driven radial highlight ──────────────────────── */
+/* A soft warm halo that follows the cursor while hovered. Lives
+   above the base background but below content. Inert when --mx
+   / --my hold their resting 0/0. */
+.cl-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: radial-gradient(
+    280px circle at calc(50% + var(--mx) * 32%) calc(50% + var(--my) * 32%),
+    oklch(0.78 0.11 85 / 0.10) 0%,
+    oklch(0.78 0.11 85 / 0.04) 30%,
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-item:hover::before,
+.cl-item.cl-hovered::before {
   opacity: 1;
 }
 
-/* Safari fallback path — uses a real .cl-body div. JS sets inline
-   height in px; CSS just provides the transition curve. */
-.cl-body {
-  overflow: clip;
-  transition: height 460ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-/* For Chromium/FF where ::details-content does the height work,
-   we don't want .cl-body itself constraining height — let it be
-   auto and let ::details-content control it. */
-@supports (interpolate-size: allow-keywords) {
-  .cl-body { height: auto !important; transition: none; }
+/* ── L1 Aurora ─────────────────────────────────────────────── */
+/* A large radial bloom anchored near the chevron (top-right).
+   filter: blur softens it into atmosphere. mix-blend-mode:
+   screen ensures it brightens regardless of card brightness. */
+.cl-fx-aurora {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  top: 50%;
+  left: calc(100% - 56px);
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    oklch(0.86 0.16 78 / 0.55) 0%,
+    oklch(0.78 0.18 30 / 0.32) 28%,
+    oklch(0.62 0.20 280 / 0.18) 55%,
+    transparent 75%);
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: blur(28px);
+  transform: translate(-50%, -50%) scale(0.4);
+  will-change: transform, opacity;
 }
 
-/* ── Summary (header bar) ─────────────────────────────────────── */
+/* ── L2 Mercury rings ──────────────────────────────────────── */
+/* Three concentric 1px rings that expand outward, staggered. */
+.cl-fx-ring {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  top: 50%;
+  left: calc(100% - 56px);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid oklch(0.85 0.14 80 / 0.55);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.15);
+  will-change: transform, opacity;
+  mix-blend-mode: screen;
+}
+.cl-fx-ring-1 { border-color: oklch(0.88 0.16 78 / 0.7);  width: 28px; height: 28px; }
+.cl-fx-ring-2 { border-color: oklch(0.78 0.18 35 / 0.45); width: 44px; height: 44px; }
+.cl-fx-ring-3 { border-color: oklch(0.70 0.16 280 / 0.32); width: 60px; height: 60px; }
+
+/* ── L3 Chromatic shimmer ──────────────────────────────────── */
+/* Three sweep bands, each tinted to one of R/G/B and slightly
+   delayed in JS to create a chromatic-aberration trail. The
+   skew angle is held inside the keyframe transforms so WAAPI
+   composites everything in one matrix. */
+.cl-fx-shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.cl-fx-shimmer-band {
+  position: absolute;
+  top: -10%; bottom: -10%;
+  left: 0;
+  width: 38%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-70%) skewX(-12deg);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+.cl-fx-shimmer-r {
+  background: linear-gradient(105deg,
+    transparent 38%,
+    oklch(0.92 0.18 30 / 0.28) 50%,
+    transparent 62%);
+}
+.cl-fx-shimmer-g {
+  background: linear-gradient(105deg,
+    transparent 38%,
+    oklch(0.94 0.13 130 / 0.34) 50%,
+    transparent 62%);
+}
+.cl-fx-shimmer-b {
+  background: linear-gradient(105deg,
+    transparent 38%,
+    oklch(0.88 0.14 250 / 0.26) 50%,
+    transparent 62%);
+}
+
+/* ── L4 Border energy (conic-gradient orbit) ──────────────── */
+/* A 1.5px-wide ring drawn on the card edge that rotates around
+   the perimeter during open. Implemented via a conic-gradient
+   masked to a thin frame using the standard "padding-box"
+   subtract trick (mask-composite: exclude). */
+.cl-fx-border {
+  position: absolute;
+  inset: -1px;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1.5px;
+  opacity: 0;
+  background: conic-gradient(from var(--be-angle, 0deg),
+    transparent 0deg,
+    oklch(0.88 0.16 78 / 0.85) 30deg,
+    oklch(0.78 0.18 35 / 0.4) 65deg,
+    transparent 110deg,
+    transparent 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  will-change: --be-angle, opacity;
+}
+
+/* ── L5 Scribe (top edge laser sweep) ──────────────────────── */
+.cl-fx-scribe {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    oklch(0.88 0.16 78 / 0.5) 25%,
+    oklch(0.92 0.18 78 / 0.95) 50%,
+    oklch(0.88 0.16 78 / 0.5) 75%,
+    transparent 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* ── Summary (header bar) ─────────────────────────────────── */
 .cl-summary {
   position: relative;
-  z-index: 1;
+  z-index: 5;
   list-style: none;
   display: grid;
   grid-template-columns: 56px 1fr 32px;
@@ -125,7 +319,7 @@
   border-radius: var(--r-2);
 }
 
-/* ── Number badge ─────────────────────────────────────────────── */
+/* ── Number badge ─────────────────────────────────────────── */
 .cl-num {
   font-family: var(--font-mono);
   font-size: 0.9375rem;
@@ -135,13 +329,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.55em;
-  transition: color 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 360ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .cl-item[open] .cl-num,
 .cl-item:not([open]):hover .cl-num {
   color: color-mix(in oklab, var(--ink-strong) 60%, var(--accent));
 }
-
 .cl-num::before {
   content: "";
   width: 1px;
@@ -150,15 +343,15 @@
   display: inline-block;
   transition:
     background 320ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform  320ms cubic-bezier(0.34, 1.4, 0.5, 1);
+    transform  360ms cubic-bezier(0.34, 1.42, 0.5, 1);
   transform-origin: center;
 }
 .cl-item[open] .cl-num::before {
   background: var(--accent);
-  transform: scaleY(1.15);
+  transform: scaleY(1.2);
 }
 
-/* ── Title ────────────────────────────────────────────────────── */
+/* ── Title ────────────────────────────────────────────────── */
 .cl-title {
   font-family: var(--font-sans);
   font-size: 1.0625rem;
@@ -167,9 +360,13 @@
   letter-spacing: -0.005em;
   color: var(--ink-strong);
   margin: 0;
+  transition: letter-spacing 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cl-item[open] .cl-title {
+  letter-spacing: -0.012em;
 }
 
-/* ── Chevron — pure CSS rotation with spring-bezier overshoot ── */
+/* ── Chevron — 2-stage spring rotate + halo + draw ────────── */
 .cl-chevron {
   position: relative;
   width: 32px;
@@ -177,92 +374,99 @@
   display: grid;
   place-items: center;
   pointer-events: none;
-  transform: rotate(0deg);
-  transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: rotate(0deg) scale(1);
+  transition: transform 480ms cubic-bezier(0.34, 1.58, 0.58, 1);
 }
 .cl-item[open] .cl-chevron {
-  transform: rotate(180deg);
+  transform: rotate(180deg) scale(1.04);
 }
 .cl-item:not([open]):hover .cl-chevron {
-  transform: rotate(8deg) scale(1.08);
-  transition: transform 280ms cubic-bezier(0.34, 1.4, 0.5, 1);
+  transform: rotate(6deg) scale(1.1) translateY(1px);
+  transition: transform 320ms cubic-bezier(0.34, 1.42, 0.5, 1);
 }
-
 .cl-chevron svg {
   width: 14px;
   height: 14px;
   stroke: var(--ink-muted);
   stroke-width: 1.5;
   fill: none;
-  transition: stroke 320ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: stroke 360ms cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
 }
 .cl-item[open] .cl-chevron svg,
 .cl-item:not([open]):hover .cl-chevron svg {
-  stroke: color-mix(in oklab, var(--ink-strong) 50%, var(--accent));
+  stroke: color-mix(in oklab, var(--ink-strong) 45%, var(--accent));
 }
-
-/* ── Shimmer sweep — base state. WAAPI fills in keyframes. ───── */
-.cl-shimmer {
+.cl-chevron-halo {
   position: absolute;
-  top: 0; bottom: 0;
-  left: 0;
-  width: 45%;
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0;
-  background: linear-gradient(105deg,
-    transparent 35%,
-    oklch(0.78 0.11 85 / 0.36) 50%,
-    transparent 65%);
-  transform: translateX(-60%);
+  top: 50%; left: 50%;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    oklch(0.92 0.18 78 / 0.55) 0%,
+    oklch(0.78 0.16 60 / 0.25) 40%,
+    transparent 70%);
+  filter: blur(8px);
   mix-blend-mode: screen;
-  will-change: transform, opacity;
-}
-
-/* ── Scribe — base state. WAAPI fills in keyframes. ──────────── */
-.cl-scribe {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 1px;
   pointer-events: none;
-  z-index: 3;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  transform-origin: left center;
-  transform: scaleX(0);
   opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4);
   will-change: transform, opacity;
 }
 
-/* ── Body inner ──────────────────────────────────────────────── */
+/* ── Body inner ──────────────────────────────────────────── */
 .cl-body-inner {
   padding: 0 var(--s-5) var(--s-5) calc(var(--s-5) + 56px + var(--s-4));
+  position: relative;
 }
 
-/* Paragraph cascade — pure CSS stagger using --i + transition-delay.
-   Open: stagger forward.  Close: snap (no stagger, fade out fast). */
+/* ── L5 Glyph wave — per-word reveal ──────────────────────── */
+/* Words are wrapped in <span class="cl-word"> by JS on first
+   open. --gx is the radial-distance rank from the chevron
+   centre. Each word transitions opacity + translateY + blur,
+   staggered by --gx. The blur unrolls into a focus-pull. */
 .cl-body-inner p {
   color: var(--ink-muted);
   font-size: 0.96875rem;
   line-height: 1.65;
   margin: 0 0 var(--s-3);
-  opacity: 0;
-  transform: translateY(6px);
-  transition:
-    opacity   200ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .cl-body-inner p:last-child { margin-bottom: 0; }
 
-.cl-item[open] .cl-body-inner p {
-  opacity: 1;
-  transform: none;
+.cl-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(5px);
   transition:
-    opacity   360ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 360ms cubic-bezier(0.34, 1.2, 0.5, 1);
-  transition-delay: calc(var(--i, 0) * 60ms + 160ms);
+    opacity   480ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 600ms cubic-bezier(0.34, 1.2, 0.5, 1),
+    filter    420ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition-delay:
+    calc(var(--gx, 0) * 14ms + 140ms),
+    calc(var(--gx, 0) * 14ms + 140ms),
+    calc(var(--gx, 0) * 14ms + 140ms);
+  will-change: opacity, transform, filter;
+}
+.cl-item[open] .cl-word {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+/* Closing: snap-fade (no stagger) — fast enough that the height
+   collapse hides the rest. */
+.cl-item:not([open]) .cl-word {
+  transition-duration: 160ms, 160ms, 160ms;
+  transition-delay: 0s, 0s, 0s;
 }
 
-/* ── Section foot ─────────────────────────────────────────────── */
+/* Fallback for browsers without registered --gx interpolation —
+   <p>'s --i provides a coarse stagger. */
+.cl-body-inner p {
+  --i-delay: calc(var(--i, 0) * 90ms + 120ms);
+}
+
+/* ── Section foot ─────────────────────────────────────────── */
 .checklist-foot {
   margin-top: var(--s-6);
   color: var(--ink-muted);
@@ -270,23 +474,38 @@
   font-style: italic;
 }
 
-/* ── Reduced motion ──────────────────────────────────────────── */
+/* ── Reduced motion ──────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .cl-item,
   .cl-item *,
   .cl-chevron,
-  .cl-shimmer,
-  .cl-scribe,
-  .cl-body-inner p,
-  .cl-item::details-content {
+  .cl-word,
+  .cl-fx-aurora,
+  .cl-fx-ring,
+  .cl-fx-shimmer-band,
+  .cl-fx-border,
+  .cl-fx-scribe,
+  .cl-chevron-halo {
     transition: none !important;
     animation: none !important;
   }
   .cl-item:hover { transform: none !important; }
-  .cl-shimmer, .cl-scribe { display: none !important; }
+  .cl-fx-aurora,
+  .cl-fx-ring,
+  .cl-fx-shimmer,
+  .cl-fx-border,
+  .cl-fx-scribe,
+  .cl-chevron-halo { display: none !important; }
+  .cl-word {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .cl-body { height: auto !important; }
+  .cl-item:not([open]) .cl-body { height: 0 !important; }
 }
 
-/* ── Mobile ──────────────────────────────────────────────────── */
+/* ── Mobile ──────────────────────────────────────────────── */
 @media (max-width: 640px) {
   .cl-summary {
     grid-template-columns: 44px 1fr 28px;
@@ -298,4 +517,6 @@
   }
   .cl-num { font-size: 0.875rem; }
   .cl-title { font-size: 1rem; line-height: 1.4; }
+  .cl-fx-aurora { width: 220px; height: 220px; left: calc(100% - 44px); }
+  .cl-fx-ring { left: calc(100% - 44px); }
 }
