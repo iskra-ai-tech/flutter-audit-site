@@ -1,27 +1,20 @@
 /* ============================================================
    checklist-anim.js — multi-layer physics-driven disclosure
    ─────────────────────────────────────────────────────────
-   Each <details data-cl-item> in the §3b checklist is animated
-   by a single rAF loop running a damped-spring solver. The
-   spring drives ten CSS custom properties on the outer .cl-row,
-   each consumed by composite-only CSS transforms / opacity /
-   color-mix declarations.
+   v2 — adds hover spring (research preset: stiffness 900,
+   damping 42, ζ≈0.70, ~4% overshoot, ~280 ms settle), smoother
+   chevron via smootherstep + bell-curve wind-up (one continuous
+   curve, no kink), bulletproof open/close measurement that
+   forces a layout flush between display-flip and measurement.
 
-   Layers:
-     1  height           spring position × naturalHeight
-     2  body opacity     smoothstep(0.15, 0.85, p)
-     3  body translateY  (1 − p) × 8px
-     4  shimmer sweep    bell(p, 0.45, 0.22) — peak mid-anim
-     5  burst            bell(p, 0.55, 0.30) — border bulge
-     6  chevron rotate   p × 180° + burst-kick
-     7  border accent    color-mix p (hairline → brass)
-     8  scribe extent    smoothstep(0.05, 0.45, p)
-     9  cascade index    p (children stagger from --i)
-    10  outer shadow     p × peak alpha (open box-shadow)
+   Each <details data-cl-item> has TWO independent springs:
+     1  disclosureSpring  k=240 c=26  (slow, expressive)
+     2  hoverSpring       k=900 c=42  (snappy, immediate)
 
-   Spring: stiffness 240, damping 26, mass 1 — lightly under-
-   damped (c_crit ≈ 31, ζ ≈ 0.84) → ~10% overshoot then settle
-   in ~340 ms. Tuned per the brass-default research preset.
+   Both write CSS custom properties to the outer .cl-row (li);
+   inheritance fans them down to summary, body, chevron, etc.
+   All consumers are composite-only (transform, opacity,
+   color-mix) — no per-frame paint or layout outside body height.
    ============================================================ */
 
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -42,7 +35,6 @@ function createSpring({ stiffness = 240, damping = 26, mass = 1, restThresh = 0.
       return pos;
     },
     pos() { return pos; },
-    vel() { return vel; },
     target() { return target; },
     isResting() {
       return Math.abs(pos - target) < restThresh && Math.abs(vel) < restThresh * 8;
@@ -57,10 +49,15 @@ const smoothstep = (e0, e1, x) => {
   const t = clamp((x - e0) / (e1 - e0), 0, 1);
   return t * t * (3 - 2 * t);
 };
-// Gaussian bell, peak at `peak`, std-dev `sigma`
+// Ken Perlin smootherstep — C2-continuous (smooth derivatives).
+// Used for the chevron sweep so there's no velocity kink.
+const smootherstep = (e0, e1, x) => {
+  const t = clamp((x - e0) / (e1 - e0), 0, 1);
+  return t * t * t * (t * (t * 6 - 15) + 10);
+};
 const bell = (x, peak, sigma) => Math.exp(-((x - peak) ** 2) / (2 * sigma * sigma));
 
-// ── Per-item state, keyed by the <details> element ────────────
+// ── Per-item state ────────────────────────────────────────────
 const states = new WeakMap();
 
 function setup(details) {
@@ -73,26 +70,49 @@ function setup(details) {
 
   const state = {
     details, row, body, inner, summary,
-    spring: createSpring({ stiffness: 240, damping: 26 }),
+    disclosure: createSpring({ stiffness: 240, damping: 26 }),
+    hover:     createSpring({ stiffness: 900, damping: 42 }),
     target: details.open ? 1 : 0,
+    naturalHeight: 0,
+    closing: false,
     rafId: 0,
     lastT: 0,
-    naturalHeight: 0,
-    animating: false,
-    closing: false,
+    running: false,
   };
-  state.spring.snap(state.target);
-  paint(state, state.target); // initial pass to sync vars to DOM
+  state.disclosure.snap(state.target);
+  state.hover.snap(0);
+  paintDisclosure(state, state.target);
+  paintHover(state, 0);
   states.set(details, state);
 
   if (!details.open) body.style.height = '0px';
+  else { body.style.height = 'auto'; }
 
-  // Intercept click on summary; manage open state manually so we can
-  // animate the close path (native <details> would snap to display:none).
-  summary.addEventListener('click', onClick);
-  // Also handle keyboard activation (Space / Enter) which dispatches click,
-  // but Safari sometimes emits a separate keydown — we already cover it
-  // through the synthesized click event.
+  // Click interception — capture phase + stopImmediatePropagation
+  // for maximum cross-browser safety against the native toggle.
+  summary.addEventListener('click', onClick, true);
+
+  // Hover springs only run on collapsed items (less surprise when
+  // an open item subtly scales).
+  row.addEventListener('pointerenter', () => {
+    if (REDUCED) return;
+    if (state.details.open) return;
+    state.hover.setTarget(1);
+    startLoop(state);
+  });
+  row.addEventListener('pointerleave', () => {
+    if (REDUCED) return;
+    state.hover.setTarget(0);
+    startLoop(state);
+  });
+  // If the user opens an item while hovering, snap the hover spring
+  // back to 0 so we don't compound the scales when it later closes.
+  details.addEventListener('toggle', () => {
+    if (details.open) {
+      state.hover.setTarget(0);
+      startLoop(state);
+    }
+  });
 }
 
 function onClick(e) {
@@ -100,49 +120,61 @@ function onClick(e) {
   const details = summary.closest('details');
   const state = states.get(details);
   if (!state) return;
-
-  if (REDUCED) return; // Let native toggle handle it — no choreography.
+  if (REDUCED) return;
 
   e.preventDefault();
+  e.stopImmediatePropagation();
 
   const opening = !details.open;
 
-  // Snapshot live height first (handles mid-animation interrupts).
   if (opening) {
-    // Render content so we can measure, while keeping visual height at current spring pos.
-    const currentVisualHeight = state.body.offsetHeight;
+    // Render content so we can measure. Reading offsetHeight forces
+    // a layout flush — guarantees the browser has applied the
+    // [open] change and our CSS overrides before we measure.
     details.open = true;
-    state.body.style.height = currentVisualHeight + 'px';
-    state.naturalHeight = state.body.scrollHeight;
+    state.body.style.height = 'auto';
+    // Force layout flush. scrollHeight is the height-clamp-resistant
+    // measurement.
+    const measured = state.body.scrollHeight || state.body.offsetHeight;
+    // Snap visual back to current spring position before animating.
+    state.body.style.height = (state.disclosure.pos() * measured).toFixed(2) + 'px';
+    // Force another layout flush so the browser registers the
+    // pre-animation height before the next paint.
+    void state.body.offsetHeight;
+    state.naturalHeight = measured;
     state.closing = false;
     state.target = 1;
   } else {
+    // Closing: measure the current full height so we can shrink from it.
     state.naturalHeight = state.body.scrollHeight || state.body.offsetHeight;
-    // freeze current visual height
     state.body.style.height = state.body.offsetHeight + 'px';
+    void state.body.offsetHeight;
     state.closing = true;
     state.target = 0;
   }
-  state.spring.setTarget(state.target);
+  state.disclosure.setTarget(state.target);
   startLoop(state);
 }
 
 function startLoop(state) {
-  if (state.animating) return;
-  state.animating = true;
+  if (state.running) return;
+  state.running = true;
   state.lastT = performance.now();
-  // Promote to its own compositor layer for the duration of the animation,
-  // then release on rest so we don't leak GPU memory (one of the research
-  // gotchas: permanent will-change is more expensive than not setting it).
   state.body.style.willChange = 'height';
   state.row.style.willChange = 'transform';
+
   const tick = (now) => {
     const dt = (now - state.lastT) / 1000;
     state.lastT = now;
-    const p = state.spring.update(dt);
-    paint(state, p);
-    if (state.spring.isResting()) {
-      state.animating = false;
+    const dp = state.disclosure.update(dt);
+    const hp = state.hover.update(dt);
+    paintDisclosure(state, dp);
+    paintHover(state, hp);
+
+    const dRest = state.disclosure.isResting();
+    const hRest = state.hover.isResting();
+    if (dRest && hRest) {
+      state.running = false;
       finalize(state);
       return;
     }
@@ -151,10 +183,9 @@ function startLoop(state) {
   state.rafId = requestAnimationFrame(tick);
 }
 
-function paint(state, progress) {
+function paintDisclosure(state, progress) {
   const { row, body, naturalHeight, closing } = state;
 
-  // Visual progress can overshoot the spring's target slightly (bounce).
   const vp = clamp(progress, -0.05, 1.10);
   const p  = clamp(progress, 0, 1);
 
@@ -173,24 +204,18 @@ function paint(state, progress) {
   // ── Layer 5: burst (border bulge / scale kick) ──
   const burst = bell(p, 0.55, 0.30);
 
-  // ── Layer 6: chevron rotation + wind-up + burst kick ──
-  // Wind-up: rotate backwards by 12° during first 15% of progress on open,
-  // then forward sweep to 180°. On close, mirror the wind-up at the tail.
-  // Burst kick adds a sub-rotation jolt around mid-anim.
-  let chevBase;
-  if (!closing && p < 0.15) {
-    chevBase = lerp(0, -12, p / 0.15);
-  } else if (!closing) {
-    chevBase = lerp(-12, 180, (p - 0.15) / 0.85);
-  } else if (closing && p > 0.85) {
-    chevBase = lerp(180, 192, (1 - p) / 0.15);
-  } else {
-    chevBase = lerp(192, 0, (0.85 - p) / 0.85);
-  }
-  const chevKick = burst * 14 * (closing ? -1 : 1);
-  const chev     = (chevBase + chevKick).toFixed(2) + 'deg';
+  // ── Layer 6: chevron — smootherstep sweep + bell-curve wind-up dip.
+  // smootherstep gives C2-continuous motion (no kink). The bell-curve
+  // wind-up adds a brief backwards "wind-up" dip near the start (or
+  // end, when closing) without breaking the smooth derivative.
+  const sweep = smootherstep(0, 1, p) * 180;
+  const dipCenter = closing ? 0.85 : 0.15;
+  const dipMag    = closing ?   12 :  -12;
+  const dip       = bell(p, dipCenter, 0.08) * dipMag;
+  const kick      = burst * 10 * (closing ? -1 : 1);
+  const chev      = (sweep + dip + kick).toFixed(2) + 'deg';
 
-  // ── Layer 7: border accent (CSS reads var into color-mix) ──
+  // ── Layer 7: border accent ──
   const border = p;
 
   // ── Layer 8: scribe (hairline along top edge) ──
@@ -199,8 +224,6 @@ function paint(state, progress) {
   // ── Layer 9: cascade (children consume w/ --i stagger) ──
   const cascade = p;
 
-  // Write to the row (li); inheritance fans these out to details,
-  // summary, body, shimmer, scribe — all in one paint.
   const s = row.style;
   s.setProperty('--cl-p',          p.toFixed(4));
   s.setProperty('--cl-vp',         vp.toFixed(4));
@@ -214,25 +237,31 @@ function paint(state, progress) {
   s.setProperty('--cl-cascade',    cascade.toFixed(4));
 }
 
+// Hover paints its own variable — CSS consumes via scale + lift +
+// border breath. Independent from disclosure.
+function paintHover(state, hp) {
+  state.row.style.setProperty('--cl-hover', Math.max(0, hp).toFixed(4));
+}
+
 function finalize(state) {
   const { details, body, row, target } = state;
   if (target === 0) {
     details.open = false;
     body.style.height = '0px';
-    paint(state, 0);
+    paintDisclosure(state, 0);
   } else {
-    // Release the height clamp so dynamic content (resizing fonts,
-    // viewport changes) can flow naturally afterwards.
+    // Release the height clamp so dynamic content (font resize,
+    // viewport zoom) can flow naturally afterwards.
     body.style.height = 'auto';
-    paint(state, 1);
+    paintDisclosure(state, 1);
   }
-  // Release compositor layers (research finding: permanent will-change is
-  // more expensive than briefly toggled will-change).
+  // Release compositor layers — permanent will-change is more
+  // expensive than briefly toggled will-change.
   body.style.willChange = '';
   row.style.willChange = '';
 }
 
-// ── Cursor-follow brass radial glow (intensifies during burst) ─
+// ── Cursor-follow brass radial glow ───────────────────────────
 function bindGlow(row) {
   row.addEventListener('pointermove', (e) => {
     const r = row.getBoundingClientRect();

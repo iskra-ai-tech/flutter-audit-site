@@ -1,24 +1,27 @@
 /* ============================================================
-   Checklist v2 — ten dropdowns, physics-driven multi-layer reveal.
-   Pairs with /scripts/checklist-anim.js which drives ten CSS
-   custom properties on each .cl-row via a rAF spring loop:
+   Checklist v2 — ten dropdowns, two springs per row.
+   Pairs with /scripts/checklist-anim.js which drives:
 
-     --cl-p          0 → 1  primary progress (clamped)
-     --cl-vp         visual progress (can overshoot)
-     --cl-shimmer    bell-curve peak around p=0.45
-     --cl-burst      bell-curve peak around p=0.55
-     --cl-chev       chevron angle in deg (with wind-up + kick)
-     --cl-border     hairline → brass color-mix factor
-     --cl-scribe     0 → 1, top-edge hairline draw extent
-     --cl-cascade    0 → 1, drives staggered paragraph fade
-     --cl-body-op    body content opacity
-     --cl-body-shift body content translateY (px)
-     --mx --my       cursor position % for radial glow
+     Disclosure spring (k=240, c=26, ~10% overshoot, ~340 ms):
+       --cl-p          0 → 1  primary progress (clamped)
+       --cl-vp         visual progress (can overshoot)
+       --cl-shimmer    bell-curve peak around p=0.45
+       --cl-burst      bell-curve peak around p=0.55
+       --cl-chev       chevron angle in deg (smootherstep + dip)
+       --cl-border     hairline → brass color-mix factor
+       --cl-scribe     0 → 1, top-edge hairline draw extent
+       --cl-cascade    0 → 1, drives staggered paragraph fade
+       --cl-body-op    body content opacity
+       --cl-body-shift body content translateY (px)
 
-   All ten consumers below are composite-only (transform, opacity,
-   color-mix) — no per-frame paint or layout work outside body
-   height. Shimmer uses transform: translateX, not background-
-   position (which is not composite-thread).
+     Hover spring (k=900, c=42, ~4% overshoot, ~280 ms):
+       --cl-hover      0 → 1, drives scale + lift + border breath
+
+     Mouse follow:
+       --mx --my       cursor position % for radial glow
+
+   Failsafe: every var() has a sensible fallback so the dropdown
+   renders correctly even if the JS engine fails to load.
    ============================================================ */
 
 .checklist {
@@ -38,9 +41,10 @@
   --cl-chev: 0deg;
   --cl-border: 0;
   --cl-scribe: 0;
-  --cl-cascade: 0;
-  --cl-body-op: 0;
-  --cl-body-shift: 8px;
+  --cl-cascade: 1;       /* fallback: visible if JS never runs */
+  --cl-body-op: 1;       /* fallback: visible if JS never runs */
+  --cl-body-shift: 0px;  /* fallback: no shift if JS never runs */
+  --cl-hover: 0;
   --mx: 50%;
   --my: 50%;
 
@@ -53,12 +57,15 @@
   position: relative;
   background: linear-gradient(180deg,
               var(--bg) 0%,
-              color-mix(in oklab, var(--bg-elevated) calc(60% + var(--cl-p) * 40%), var(--bg)) 100%);
-  /* Border picks up brass as the item opens — color-mix is continuous */
+              color-mix(in oklab,
+                        var(--bg-elevated) calc(60% + var(--cl-p) * 40%),
+                        var(--bg)) 100%);
+  /* Border picks up brass as the item opens OR is hovered.
+     The max() means hover and disclosure-open share the same
+     visual channel; whichever is higher wins. */
   border: 1px solid color-mix(in oklab,
-              var(--hairline) calc((1 - var(--cl-border)) * 100%),
-              var(--accent)   calc(var(--cl-border) * 100%));
-  /* Asymmetric radius bulge — research recipe: +6px top, +10px bottom at peak burst */
+              var(--hairline) calc((1 - max(var(--cl-border), var(--cl-hover) * 0.55)) * 100%),
+              var(--accent)   calc(max(var(--cl-border), var(--cl-hover) * 0.55) * 100%));
   border-radius:
     calc(var(--cl-radius) + var(--cl-burst) * 6px)
     calc(var(--cl-radius) + var(--cl-burst) * 6px)
@@ -66,25 +73,29 @@
     calc(var(--cl-radius) + var(--cl-burst) * 10px);
   overflow: hidden;
   isolation: isolate;
-  /* Outer shadow appears only when open, scaled by progress */
   box-shadow:
-    0 1px 0 oklch(0.74 0.09 85 / calc(var(--cl-p) * 0.05)),
-    0 14px 36px -18px oklch(0.74 0.09 85 / calc(var(--cl-p) * 0.22));
-  transition: background-color var(--d-mid) var(--ease-out-quart);
+    0 1px 0 oklch(0.74 0.09 85 / calc(max(var(--cl-p), var(--cl-hover) * 0.5) * 0.05)),
+    0 14px 36px -18px oklch(0.74 0.09 85 / calc(max(var(--cl-p), var(--cl-hover) * 0.5) * 0.22));
+  /* Hover transform: subtle scale + lift, both driven by the
+     hover spring. Composite-only (no layout impact). */
+  transform:
+    scale(calc(1 + var(--cl-hover) * 0.014))
+    translateY(calc(var(--cl-hover) * -2px));
+  transform-origin: center top;
 }
 
-/* Inner radial glow — cursor-follow brass, intensifies with burst */
+/* Inner radial glow — cursor-follow brass, intensifies during burst */
 .cl-item::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(280px circle at var(--mx) var(--my),
-              oklch(0.74 0.09 85 / calc(0.05 + var(--cl-burst) * 0.10)),
+              oklch(0.74 0.09 85 / calc(0.05 + var(--cl-burst) * 0.10 + var(--cl-hover) * 0.05)),
               transparent 62%);
   pointer-events: none;
   z-index: 0;
-  opacity: calc(0.4 + var(--cl-p) * 0.6);
+  opacity: calc(0.4 + var(--cl-p) * 0.6 + var(--cl-hover) * 0.5);
 }
 
 /* ── Shimmer sweep (composite-only via transform translateX) ──── */
@@ -95,17 +106,14 @@
   width: 50%;
   pointer-events: none;
   z-index: 2;
-  opacity: var(--cl-shimmer);
-  /* 105° angle + asymmetric stops 35/50/65: "light on curved surface" */
+  opacity: var(--cl-shimmer, 0);
   background: linear-gradient(105deg,
               transparent 35%,
               oklch(0.78 0.11 85 / 0.34) 50%,
               transparent 65%);
-  /* translateX sweeps from -50% to ~270% across the item width */
-  transform: translateX(calc(var(--cl-shimmer) * 320%));
+  transform: translateX(calc(var(--cl-shimmer, 0) * 320%));
   filter: blur(1.5px);
   mix-blend-mode: screen;
-  will-change: transform, opacity;
 }
 
 /* ── Hairline scribe along top edge ─────────────────────────── */
@@ -121,11 +129,11 @@
               var(--accent) 82%,
               transparent 100%);
   transform-origin: left center;
-  transform: scaleX(var(--cl-scribe));
+  transform: scaleX(var(--cl-scribe, 0));
   opacity: 0.75;
 }
 
-/* ── Summary (the clickable header) ───────────────────────────── */
+/* ── Summary ──────────────────────────────────────────────────── */
 .cl-summary {
   position: relative;
   z-index: 1;
@@ -148,7 +156,6 @@
   border-radius: var(--r-2);
 }
 
-/* Number badge — recolors with progress, lifts on burst */
 .cl-num {
   font-family: var(--font-mono);
   font-size: 0.9375rem;
@@ -162,6 +169,7 @@
   align-items: center;
   gap: 0.55em;
   white-space: nowrap;
+  opacity: 1;
 }
 
 .cl-num::before {
@@ -176,7 +184,6 @@
   transform-origin: center;
 }
 
-/* Title sits flat — chevron and number do the motion work */
 .cl-title {
   font-family: var(--font-sans);
   font-size: 1.0625rem;
@@ -185,16 +192,16 @@
   letter-spacing: -0.005em;
   color: var(--ink-strong);
   margin: 0;
+  opacity: 1;
 }
 
-/* ── Chevron: SVG with multi-layer transform ──────────────────── */
+/* ── Chevron ──────────────────────────────────────────────────── */
 .cl-chevron {
   position: relative;
   width: 32px;
   height: 32px;
   display: grid;
   place-items: center;
-  /* JS-driven rotation includes wind-up + sweep + burst kick */
   transform: rotate(var(--cl-chev)) scale(calc(1 + var(--cl-burst) * 0.20));
   transform-origin: center;
   pointer-events: none;
@@ -208,12 +215,10 @@
               var(--accent)    calc(var(--cl-p) * 100%));
   stroke-width: 1.5;
   fill: none;
-  /* Subtle stretch on burst — emulates path morph cheaply */
   transform: scaleY(calc(1 - var(--cl-burst) * 0.18));
   transform-origin: center;
 }
 
-/* Halo ring pulses at burst peak */
 .cl-chevron::after {
   content: "";
   position: absolute;
@@ -224,18 +229,31 @@
   pointer-events: none;
 }
 
-/* ── Body container (height animated by JS) ──────────────────── */
+/* ── Body container ───────────────────────────────────────────── */
+/* The native UA stylesheet hides non-summary children of closed
+   <details> with display: none !important. We override so the
+   body is always rendered (display:block) and only its height
+   is animated. This also makes scrollHeight measurement
+   trustworthy. */
 .cl-body {
+  display: block !important;
   position: relative;
   z-index: 1;
   overflow: hidden;
-  height: 0;
+  height: 0;  /* default for closed; JS overrides inline */
+}
+
+.cl-item[open] > .cl-body {
+  /* Fallback: if JS never runs, an opened item shows content
+     at its natural height. JS overrides this with an inline px
+     value during the spring animation. */
+  height: auto;
 }
 
 .cl-body-inner {
   padding: 0 var(--s-5) var(--s-5) calc(var(--s-5) + 56px + var(--s-4));
-  opacity: var(--cl-body-op);
-  transform: translateY(var(--cl-body-shift));
+  opacity: var(--cl-body-op, 1);
+  transform: translateY(var(--cl-body-shift, 0px));
 }
 
 .cl-body-inner p {
@@ -243,11 +261,12 @@
   font-size: 0.96875rem;
   line-height: 1.65;
   margin: 0 0 var(--s-3);
-  /* Per-paragraph cascade: each <p style="--i:N"> fades in as
-     cascade exceeds N × 0.08 */
-  opacity: clamp(0, calc((var(--cl-cascade) - var(--i, 0) * 0.08) * 4), 1);
+  /* Per-paragraph cascade. Fallback `--cl-cascade: 1` ensures
+     content is visible if JS doesn't run; during animation, JS
+     drives --cl-cascade from 0 to 1. */
+  opacity: clamp(0, calc((var(--cl-cascade, 1) - var(--i, 0) * 0.08) * 4), 1);
   transform: translateY(calc(
-    (1 - clamp(0, calc((var(--cl-cascade) - var(--i, 0) * 0.08) * 4), 1)) * 6px));
+    (1 - clamp(0, calc((var(--cl-cascade, 1) - var(--i, 0) * 0.08) * 4), 1)) * 6px));
 }
 
 .cl-body-inner p:last-child { margin-bottom: 0; }
@@ -260,45 +279,23 @@
   font-style: italic;
 }
 
-/* ── Scroll-driven entry reveal (preserved from v1) ──────────── */
-@supports (animation-timeline: view()) {
-  .checklist > li {
-    opacity: 0;
-    animation-timeline: view();
-    animation-fill-mode: both;
-    animation-timing-function: linear;
-  }
-  .checklist > li:nth-child(odd)  { animation-name: clRowInL; }
-  .checklist > li:nth-child(even) { animation-name: clRowInR; }
-  .checklist > li:nth-child(1)  { animation-range: entry  4% cover 20%; }
-  .checklist > li:nth-child(2)  { animation-range: entry  7% cover 23%; }
-  .checklist > li:nth-child(3)  { animation-range: entry 10% cover 26%; }
-  .checklist > li:nth-child(4)  { animation-range: entry 13% cover 29%; }
-  .checklist > li:nth-child(5)  { animation-range: entry 16% cover 32%; }
-  .checklist > li:nth-child(6)  { animation-range: entry 19% cover 35%; }
-  .checklist > li:nth-child(7)  { animation-range: entry 22% cover 38%; }
-  .checklist > li:nth-child(8)  { animation-range: entry 25% cover 41%; }
-  .checklist > li:nth-child(9)  { animation-range: entry 28% cover 44%; }
-  .checklist > li:nth-child(10) { animation-range: entry 31% cover 47%; }
-}
-@keyframes clRowInL { 0% { opacity: 0; transform: translate(-10px, 12px); } 100% { opacity: 1; transform: none; } }
-@keyframes clRowInR { 0% { opacity: 0; transform: translate( 10px, 12px); } 100% { opacity: 1; transform: none; } }
-
-/* ── Reduced motion: collapse choreography to native disclosure ── */
+/* ── Reduced motion — strip all spring choreography ──────────── */
 @media (prefers-reduced-motion: reduce) {
   .checklist > li {
     --cl-p: 0;
     --cl-shimmer: 0;
     --cl-burst: 0;
     --cl-scribe: 0;
+    --cl-hover: 0;
+    --cl-cascade: 1;
+    --cl-body-op: 1;
     opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
   }
   .cl-item {
     border-color: var(--hairline) !important;
     border-radius: var(--cl-radius) !important;
     box-shadow: none !important;
+    transform: none !important;
   }
   .cl-shimmer, .cl-scribe, .cl-chevron::after { display: none !important; }
   .cl-item[open] .cl-chevron { transform: rotate(180deg) !important; }

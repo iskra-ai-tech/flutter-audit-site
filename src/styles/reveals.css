@@ -146,29 +146,14 @@ html.js-motion .bento-card h3 { transform: translateY(6px); }
 .bento-card.is-in p:not(.bento-num):not(.bento-card-edge)          { opacity: 1; transition-delay: calc(var(--i, 0) * 130ms + 550ms); }
 .bento-card.is-in .bento-card-edge                                 { opacity: 1; transition-delay: calc(var(--i, 0) * 130ms + 700ms); }
 
-/* ─── Checklist 12 items — weaving stagger ─────────────────── */
+/* ─── Checklist dropdowns — v2 row-level entry (descendants
+       are visibility-controlled by the JS spring engine, not here) ─ */
 html.js-motion .checklist > li {
   opacity: 0;
-  transition: opacity 700ms cubic-bezier(0.05, 0.7, 0.1, 1),
-              transform 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
+  transition: opacity 700ms cubic-bezier(0.05, 0.7, 0.1, 1);
   transition-delay: calc(var(--i, 0) * 70ms);
 }
-html.js-motion .checklist > li:nth-child(odd)  { transform: translate(-10px, 18px); }
-html.js-motion .checklist > li:nth-child(even) { transform: translate( 10px, 18px); }
-.checklist > li.is-in { opacity: 1; transform: none; }
-
-html.js-motion .checklist > li .cl-num,
-html.js-motion .checklist > li h3,
-html.js-motion .checklist > li p {
-  opacity: 0;
-  transition: opacity 500ms cubic-bezier(0.25, 1, 0.5, 1),
-              transform 600ms cubic-bezier(0.25, 1, 0.5, 1);
-}
-html.js-motion .checklist > li .cl-num { transform: translateY(14px) rotate(-6deg); }
-
-.checklist > li.is-in .cl-num { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 70ms + 200ms); }
-.checklist > li.is-in h3      { opacity: 1; transition-delay: calc(var(--i, 0) * 70ms + 350ms); }
-.checklist > li.is-in p       { opacity: 1; transition-delay: calc(var(--i, 0) * 70ms + 450ms); }
+.checklist > li.is-in { opacity: 1; }
 
 /* ─── Philosophy paragraphs ────────────────────────────────── */
 html.js-motion .philosophy p {
