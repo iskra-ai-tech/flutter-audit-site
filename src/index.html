@@ -166,7 +166,7 @@
 <a href="#top" class="visually-hidden">Skip to content</a>
 
 <header class="nav" data-revealed="true">
-  <a class="nav-brand" href="#top">nikita.audit</a>
+  <a class="nav-brand" href="#top" aria-label="Home"></a>
   <nav class="nav-links" aria-label="Sections">
     <a class="nav-link" href="#problem">Problem</a>
     <a class="nav-link" href="#deliverables">Deliverables</a>
@@ -175,7 +175,7 @@
     <a class="nav-link" href="#faq">FAQ</a>
     <a class="nav-link" href="#about">About</a>
   </nav>
-  <a class="nav-cta" href="#book">Book the audit</a>
+  <span aria-hidden="true" class="nav-spacer"></span>
 </header>
 
 <div class="hero-hairline" aria-hidden="true"></div>
@@ -776,7 +776,7 @@
   <div class="page">
     <div class="footer-grid">
       <div class="footer-meta">
-        <p>nikita.audit · flutter audits · <span class="num">MMXXVI</span></p>
+        <p>Flutter Audit · <span class="num">MMXXVI</span></p>
         <p class="muted">Hand-coded. Zero trackers. <span class="num">~28 KB</span> initial transfer.</p>
       </div>
       <nav class="footer-links" aria-label="Elsewhere">
@@ -789,10 +789,10 @@
   </div>
 </footer>
 
-<!-- Sticky mobile-only bottom CTA — hidden when the form section is in view -->
+<!-- Floating pill CTA — always present, hidden when the form section is in view -->
 <div class="sticky-cta" data-sticky-cta aria-hidden="false">
-  <a class="cta" href="#book">
-    Book the audit
+  <a class="cta sticky-cta-pill" href="#book">
+    Book Audit
     <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
   </a>
 </div>
