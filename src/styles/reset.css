@@ -22,7 +22,11 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
-/* Native scroll smoothing only for anchor jumps */
+/* Anchor-jump smoothing is owned by motion.js' setupSmoothScroll
+   (rAF easeInOutQuint, URL-silent). Leaving scroll-behavior at
+   `auto` here so the CSS rule does not re-smooth each per-frame
+   scrollTo and fight the JS curve. scroll-padding-top still applies
+   to scrollIntoView() calls (e.g., form success). */
 @media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h, 64px) + var(--s-4)); }
+  html { scroll-padding-top: calc(var(--nav-h, 64px) + var(--s-4)); }
 }

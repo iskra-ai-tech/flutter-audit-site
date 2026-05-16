@@ -444,16 +444,6 @@ function setupNav() {
       const sec = document.getElementById(id);
       if (sec) map.set(sec, a);
     });
-    new IntersectionObserver((ents) => {
-      ents.forEach((e) => {
-        const a = map.get(e.target);
-        if (!a) return;
-        if (e.isIntersecting) {
-          links.forEach((l) => l.removeAttribute("aria-current"));
-          a.setAttribute("aria-current", "true");
-        }
-      });
-    }, { rootMargin: "-40% 0% -55% 0%", threshold: 0 }).observe;
     map.forEach((_, sec) => {
       const io = new IntersectionObserver((ents) => {
         ents.forEach((e) => {
@@ -618,29 +608,42 @@ function setupSmoothScroll() {
     }
   }
 
+  /* CSS scroll-behavior: smooth would otherwise re-smooth every
+     per-frame scrollTo, fighting our easing curve. Force instant on
+     each tick so our rAF is the only animator. */
+  function jumpTo(y) {
+    try { window.scrollTo({ top: y, left: 0, behavior: "instant" }); }
+    catch { window.scrollTo(0, y); }
+  }
+
   function scrollToY(targetY) {
     cancel();
     const startY = window.scrollY;
     const dist = targetY - startY;
     if (Math.abs(dist) < 2) return;
-    if (REDUCED) { window.scrollTo(0, targetY); return; }
+    if (REDUCED) { jumpTo(targetY); return; }
     /* Distance-scaled duration. Small jumps stay snappy; long jumps
        breathe. 0.55 ms/px gives the silky cadence; clamp keeps both
        extremes pleasant. */
     const duration = Math.min(1300, Math.max(620, Math.abs(dist) * 0.55));
     const t0 = performance.now();
-    cancelOnInput = () => cancel();
-    ["wheel", "touchstart", "keydown", "pointerdown"].forEach((ev) =>
-      window.addEventListener(ev, cancelOnInput, { passive: true })
-    );
-    function step(now) {
-      const t = Math.min(1, (now - t0) / duration);
-      const y = startY + dist * easeInOutQuint(t);
-      window.scrollTo(0, y);
-      if (t < 1) raf = requestAnimationFrame(step);
-      else cancel();
-    }
-    raf = requestAnimationFrame(step);
+    /* Defer attaching the user-input cancel listeners by one frame —
+       the same gesture that triggered the click (pointerdown, touch
+       tap) would otherwise immediately cancel us. */
+    raf = requestAnimationFrame((firstNow) => {
+      cancelOnInput = () => cancel();
+      ["wheel", "touchstart", "keydown", "pointerdown"].forEach((ev) =>
+        window.addEventListener(ev, cancelOnInput, { passive: true })
+      );
+      function step(now) {
+        const t = Math.min(1, (now - t0) / duration);
+        const y = startY + dist * easeInOutQuint(t);
+        jumpTo(y);
+        if (t < 1) raf = requestAnimationFrame(step);
+        else cancel();
+      }
+      step(firstNow);
+    });
   }
 
   function targetYFor(id) {
