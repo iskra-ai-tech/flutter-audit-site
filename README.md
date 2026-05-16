@@ -48,40 +48,36 @@ It copies the photo into `.research/`, then rebuilds — the build pipeline does
 
 ## Deploy
 
-### Cloudflare Pages (recommended — Brotli + Early Hints + HTTP/3)
+Production lives on **Cloudflare Pages** at `https://flutteraudit.com`. The build is pre-tuned for it: `public/_headers` is CF Pages-native syntax, every text asset is Brotli-precompressed at q=11 so the edge can serve `.br` directly, and the domain is already on Cloudflare nameservers so DNS is wired automatically when the custom domain is bound.
 
-1. Push this repo to GitHub (private OK).
-2. In Cloudflare → **Pages → Create project → Connect to Git**.
-3. Build command: `npm run build`. Build output: `public`.
-4. Add a custom domain in Pages settings.
+### One-time setup — dashboard (recommended)
 
-`public/_headers` already configures security headers + cache policy.
+1. **Cloudflare → Workers & Pages → Create → Pages → Connect to Git** → authorize Cloudflare to read this GitHub repo (one-time).
+2. **Project name:** `flutteraudit` (or any slug — only affects the `*.pages.dev` staging URL).
+3. **Production branch:** `main`. **Build command:** `npm run build`. **Build output:** `public`. **Root directory:** *(blank)*.
+4. **Environment variable:** `SITE_ORIGIN=https://flutteraudit.com` — drives canonical/OG/sitemap URLs.
+5. Deploy. Then **Custom domains → Set up custom domain → `flutteraudit.com`**. CF auto-creates the CNAME flattening on the same zone — no DNS edits in another tab.
 
-### GitHub Pages with custom domain (current production)
+Repeat after first deploy: every push to `main` triggers an automatic deploy.
 
-The `.github/workflows/pages.yml` action runs on every push to `main`. It:
+### Alternative — Wrangler CLI (one-shot deploys)
 
-1. Runs `npm run build` with `SITE_ORIGIN=https://flutteraudit.com` so canonical, OG, sitemap, robots, llms.txt all point at the apex domain.
-2. Includes `src/public/CNAME` (containing `flutteraudit.com`) in the artifact so GitHub Pages keeps the custom-domain binding across deploys (without the CNAME file each deploy resets the setting).
-3. Uploads `public/` and triggers the Pages deploy.
+```bash
+npm install -g wrangler
+wrangler login                                          # opens browser, one time
+npm run build                                           # → public/
+wrangler pages deploy public --project-name=flutteraudit
+```
 
-DNS records required at your registrar for the apex domain:
+After the first CLI deploy, bind the custom domain in the dashboard (the CLI doesn't expose a custom-domains command).
 
-| Type  | Host | Value                  |
-|-------|------|------------------------|
-| A     | @    | 185.199.108.153        |
-| A     | @    | 185.199.109.153        |
-| A     | @    | 185.199.110.153        |
-| A     | @    | 185.199.111.153        |
-| AAAA  | @    | 2606:50c0:8000::153    |
-| AAAA  | @    | 2606:50c0:8001::153    |
-| AAAA  | @    | 2606:50c0:8002::153    |
-| AAAA  | @    | 2606:50c0:8003::153    |
-| CNAME | www  | iskra-ai-tech.github.io |
+### What the edge does for free on CF Pages
 
-GitHub Pages provisions Let's Encrypt automatically once DNS resolves (a few minutes). Enable "Enforce HTTPS" in repo Settings → Pages.
-
-(GitHub Pages does not serve Brotli, only gzip. ~10–15% slower delivery than Cloudflare Pages — kept on GH Pages for simpler ownership.)
+- Brotli serving of `*.html.br` / `*.txt.br` / `*.xml.br` (the build emits these).
+- HTTP/3 + 0-RTT.
+- Edge cache honoring `_headers` `Cache-Control` (immutable for `/assets/*`).
+- Auto Let's Encrypt cert + Universal SSL.
+- Early Hints when enabled in the Pages project settings.
 
 ## Replace before going live
 
