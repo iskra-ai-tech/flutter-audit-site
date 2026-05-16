@@ -516,7 +516,7 @@ function setupForm() {
           const thanks = document.createElement("div");
           thanks.className = "form-thanks";
           thanks.setAttribute("role", "status");
-          thanks.innerHTML = '<p class="eyebrow"><span class="num">08</span>&nbsp;Received</p><h3>Got it.</h3><p class="lede muted">You will hear from me within 24 hours, even if the answer is &ldquo;I am not the right fit.&rdquo; If your repo is private, I will reply with a GitHub handle to invite as a read-only collaborator.</p>';
+          thanks.innerHTML = '<p class="eyebrow"><span class="num">08</span>&nbsp;Received</p><h3>Got it.</h3><p class="lede muted">I read every form personally and reply within 24 hours with a fit assessment and a scoped quote. If your repo is private, I will reply with a GitHub handle to invite as a read-only collaborator.</p>';
           form.replaceWith(thanks);
           wrap?.scrollIntoView({ behavior: "smooth", block: "center" });
           return;
