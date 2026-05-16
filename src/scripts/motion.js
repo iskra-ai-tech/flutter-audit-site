@@ -475,11 +475,63 @@ function setupForm() {
   const stickyCta = document.querySelector("[data-sticky-cta]");
   if (form) {
     const formOpenedAt = performance.now();
-    form.addEventListener("submit", (e) => {
-      if (form.elements?.namedItem("company")?.value) { e.preventDefault(); return; }
+    const errSlot = form.querySelector(".form-error");
+    const btn = form.querySelector("[type=submit]");
+    const btnLabel = btn?.querySelector(".form-submit-label");
+    const setLabel = (t) => { if (btnLabel) btnLabel.textContent = t; };
+    const showError = (msg) => {
+      if (!errSlot) return;
+      errSlot.textContent = msg;
+      errSlot.hidden = false;
+    };
+    const clearError = () => { if (errSlot) { errSlot.hidden = true; errSlot.textContent = ""; } };
+
+    form.addEventListener("submit", async (e) => {
+      /* Honeypot — `_gotcha` is Formspree's reserved field. Bot fills it; bounce silently. */
+      if (form.elements?.namedItem("_gotcha")?.value) { e.preventDefault(); return; }
+      /* Time-on-form gate — under 1.5 s = scripted submit. */
       if (performance.now() - formOpenedAt < 1500) { e.preventDefault(); return; }
-      const btn = form.querySelector("[type=submit]");
-      if (btn) btn.textContent = "Sending…";
+      /* Honor native client-side validation; fall through to browser UI on fail. */
+      if (!form.checkValidity()) { return; }
+
+      /* Progressive enhancement: intercept and AJAX-submit so we keep the user
+         on the page with an in-DOM success swap. If fetch is unsupported or
+         the user is offline, let the native POST run and Formspree's `_next`
+         field handles the redirect. */
+      if (typeof fetch !== "function" || !navigator.onLine) return;
+
+      e.preventDefault();
+      clearError();
+      if (btn) btn.disabled = true;
+      setLabel("Sending…");
+
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+        if (res.ok) {
+          const wrap = form.parentElement;
+          const thanks = document.createElement("div");
+          thanks.className = "form-thanks";
+          thanks.setAttribute("role", "status");
+          thanks.innerHTML = '<p class="eyebrow"><span class="num">08</span>&nbsp;Received</p><h3>Got it.</h3><p class="lede muted">You will hear from me within 24 hours, even if the answer is &ldquo;I am not the right fit.&rdquo; If your repo is private, I will reply with a GitHub handle to invite as a read-only collaborator.</p>';
+          form.replaceWith(thanks);
+          wrap?.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        const json = await res.json().catch(() => ({}));
+        const msg = json?.errors?.[0]?.message
+          || "Submission failed. Email hello@flutteraudit.com directly with the same details.";
+        showError(msg);
+        if (btn) btn.disabled = false;
+        setLabel("Send");
+      } catch {
+        showError("Network error. Email hello@flutteraudit.com directly with the same details.");
+        if (btn) btn.disabled = false;
+        setLabel("Send");
+      }
     });
     if (stickyCta && "IntersectionObserver" in window) {
       const target = document.getElementById("book");

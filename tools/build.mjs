@@ -217,13 +217,21 @@ try {
   console.warn("[build] OG image not generated:", e.message);
 }
 
-// ── 7. Static public assets ──────────────────────────────────
-const publicAssetsSrc = join(SRC, "public");
-if (existsSync(publicAssetsSrc)) {
-  for (const entry of await readdir(publicAssetsSrc, { withFileTypes: true })) {
-    if (entry.isFile()) await copyFile(join(publicAssetsSrc, entry.name), join(PUBLIC_DIR, entry.name));
+// ── 7. Static public assets (recursive copy) ─────────────────
+async function copyTree(srcDir, dstDir) {
+  for (const entry of await readdir(srcDir, { withFileTypes: true })) {
+    const s = join(srcDir, entry.name);
+    const d = join(dstDir, entry.name);
+    if (entry.isDirectory()) {
+      await mkdir(d, { recursive: true });
+      await copyTree(s, d);
+    } else if (entry.isFile()) {
+      await copyFile(s, d);
+    }
   }
 }
+const publicAssetsSrc = join(SRC, "public");
+if (existsSync(publicAssetsSrc)) await copyTree(publicAssetsSrc, PUBLIC_DIR);
 
 // ── 8. SEO / metadata files ──────────────────────────────────
 await writeText(join(PUBLIC_DIR, "robots.txt"), `User-agent: *
@@ -286,7 +294,7 @@ await writeText(join(PUBLIC_DIR, "_headers"), `/*
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; font-src 'self'; form-action 'self' https://formspree.io; base-uri 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://formspree.io; form-action 'self' https://formspree.io; base-uri 'self'; frame-ancestors 'none'
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
@@ -298,7 +306,7 @@ await writeText(join(PUBLIC_DIR, "_headers"), `/*
 await writeText(join(PUBLIC_DIR, ".nojekyll"), "");
 
 // ── 9. Brotli precompress text assets ────────────────────────
-const toBrotli = ["index.html", "robots.txt", "sitemap.xml", "llms.txt"];
+const toBrotli = ["index.html", "robots.txt", "sitemap.xml", "llms.txt", "404.html", "thanks/index.html"];
 const brSizes = {};
 for (const f of toBrotli) {
   const p = join(PUBLIC_DIR, f);

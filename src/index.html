@@ -517,8 +517,8 @@
       <p class="lede muted">Or describe the one thing hurting most. I read every form myself, usually within 24 hours.</p>
     </header>
 
-    <form class="form" data-intake method="POST" action="https://formspree.io/f/REPLACE_ME">
-      <input class="honeypot" type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <form class="form" data-intake method="POST" action="https://formspree.io/f/xrejnrkl" novalidate>
+      <input class="honeypot" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true">
 
       <div class="form-row" data-reveal data-reveal-group="form">
         <label for="f-name">Name</label>
@@ -543,16 +543,27 @@
         <p class="hint">One symptom is enough. The audit will find the rest.</p>
       </div>
 
-      <input type="hidden" name="_subject" value="Audit intake from flutteraudit.com">
+      <!-- Formspree special fields: `subject` (semantic; plugin-compatible) uses
+           Mustache templating to interpolate the submitter's name; `_next` is the
+           no-JS fallback redirect after Formspree accepts the POST; `_format=plain`
+           keeps the email body as plain text instead of HTML. -->
+      <input type="hidden" name="subject" value="Audit intake from {{name}} via flutteraudit.com">
+      <input type="hidden" name="_next" value="https://flutteraudit.com/thanks/">
       <input type="hidden" name="_format" value="plain">
 
       <button class="form-submit" type="submit">
-        Send
+        <span class="form-submit-label">Send</span>
         <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
       </button>
 
+      <p class="form-error" role="alert" hidden></p>
+
       <p class="form-microcopy">
         I read every form myself. You will hear from me within 24 hours, even if the answer is “I am not the right fit.” Your code, your email, and what you write here are not shared, sold, or used to train any model.
+      </p>
+
+      <p class="form-fineprint">
+        By submitting you agree to be contacted about your Flutter audit. Submissions are processed by <a href="https://formspree.io/legal/privacy-policy/" rel="noopener">Formspree</a> (SOC 2 Type II, US-East) and forwarded to my inbox. To delete a submission, email <a href="mailto:hello@flutteraudit.com?subject=Delete%20my%20submission">hello@flutteraudit.com</a>.
       </p>
 
       <noscript>

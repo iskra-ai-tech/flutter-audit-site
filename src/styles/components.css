@@ -329,12 +329,57 @@
 }
 .form-submit:hover::after, .form-submit:focus-visible::after { transform: scaleX(1); }
 .form-submit:hover { border-color: var(--ink-muted); background: oklch(0.205 0.006 250); }
+.form-submit:disabled { opacity: 0.55; cursor: progress; }
+.form-submit:disabled::after { transform: scaleX(0); }
 
 .form-microcopy {
   color: var(--ink-faint);
   font-size: 0.8125rem;
   max-width: 48ch;
   line-height: 1.55;
+}
+
+.form-fineprint {
+  color: var(--ink-faint);
+  font-size: 0.75rem;
+  max-width: 56ch;
+  line-height: 1.5;
+  margin-top: var(--s-2);
+}
+.form-fineprint a { color: var(--ink-muted); border-bottom: 1px solid var(--hairline); }
+.form-fineprint a:hover { color: var(--ink-strong); border-color: var(--accent); }
+
+.form-error {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--signal-danger, oklch(0.65 0.18 25));
+  background: oklch(0.18 0.04 25 / 0.18);
+  border-left: 2px solid var(--signal-danger, oklch(0.65 0.18 25));
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--r-1);
+  max-width: 56ch;
+}
+
+.form-thanks {
+  display: grid;
+  gap: var(--s-3);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid var(--hairline-strong);
+  border-radius: var(--r-3);
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+  max-width: var(--w-narrow);
+  animation: thanks-in var(--d-fg) var(--ease-emphasized) both;
+}
+.form-thanks h3 {
+  font-size: var(--type-title);
+  line-height: var(--lh-title);
+  margin: 0;
+  color: var(--ink-strong);
+}
+.form-thanks .eyebrow { margin: 0; }
+@keyframes thanks-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Pricing card ──────────────────────────────── */
