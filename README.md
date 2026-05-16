@@ -1,6 +1,6 @@
 # Flutter Audit Site
 
-A single-page portfolio + sales page for a 3-day Flutter app audit for $500.
+A single-page portfolio + sales page for a 3-day Flutter app audit for $500. Lives at **https://flutteraudit.com**.
 
 Hand-coded HTML/CSS/JS. No framework, no runtime, no tracker. Built as a deliberate counterweight to "agency template" portfolios: editorial near-black, system fonts, restrained motion, one champagne accent.
 
@@ -57,20 +57,37 @@ It copies the photo into `.research/`, then rebuilds — the build pipeline does
 
 `public/_headers` already configures security headers + cache policy.
 
-### GitHub Pages (gzip only)
+### GitHub Pages with custom domain (current production)
 
-1. Repo → **Settings → Pages → Build and deployment → GitHub Actions**.
-2. Use the canned **Static HTML** workflow but set source directory to `public`.
-3. Run `npm run build` in CI, upload `public/`, deploy.
+The `.github/workflows/pages.yml` action runs on every push to `main`. It:
 
-(GitHub Pages does not serve Brotli, only gzip. ~10–15% slower delivery than Cloudflare Pages.)
+1. Runs `npm run build` with `SITE_ORIGIN=https://flutteraudit.com` so canonical, OG, sitemap, robots, llms.txt all point at the apex domain.
+2. Includes `src/public/CNAME` (containing `flutteraudit.com`) in the artifact so GitHub Pages keeps the custom-domain binding across deploys (without the CNAME file each deploy resets the setting).
+3. Uploads `public/` and triggers the Pages deploy.
+
+DNS records required at your registrar for the apex domain:
+
+| Type  | Host | Value                  |
+|-------|------|------------------------|
+| A     | @    | 185.199.108.153        |
+| A     | @    | 185.199.109.153        |
+| A     | @    | 185.199.110.153        |
+| A     | @    | 185.199.111.153        |
+| AAAA  | @    | 2606:50c0:8000::153    |
+| AAAA  | @    | 2606:50c0:8001::153    |
+| AAAA  | @    | 2606:50c0:8002::153    |
+| AAAA  | @    | 2606:50c0:8003::153    |
+| CNAME | www  | iskra-ai-tech.github.io |
+
+GitHub Pages provisions Let's Encrypt automatically once DNS resolves (a few minutes). Enable "Enforce HTTPS" in repo Settings → Pages.
+
+(GitHub Pages does not serve Brotli, only gzip. ~10–15% slower delivery than Cloudflare Pages — kept on GH Pages for simpler ownership.)
 
 ## Replace before going live
 
 The build prints a CI guard warning for these. CI fails with `CI=1`.
 
 - `src/index.html` — Formspree action URL still says `REPLACE_ME`. Either replace with your real Formspree endpoint or swap for a Cloudflare Worker / Resend handler.
-- `tools/build.mjs` — `SITE.origin` is `https://flutteraudit.dev`. Change to the real domain.
 - `src/index.html` — `<link rel="me">` to GitHub / LinkedIn / Stack Overflow are placeholders.
 - The trust microcopy "Audits shipped to Series A through Series C teams" is a soft anchor that you can sharpen once you have specific case-permission.
 

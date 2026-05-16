@@ -23,12 +23,12 @@ const SRC        = join(ROOT, "src");
 const PUBLIC_DIR = join(ROOT, "public");
 const ASSETS     = join(SRC, "assets");
 
-/* SITE_ORIGIN can be overridden by env (used in CI for GitHub Pages where
-   the public URL is https://<user>.github.io/<repo>). If the origin contains
-   a non-root path component, that path is also used to rewrite every
-   absolute `/asset/...` reference in the HTML so the site works under a
-   subdirectory. */
-const RAW_ORIGIN = (process.env.SITE_ORIGIN || "https://flutteraudit.dev").replace(/\/+$/, "");
+/* SITE_ORIGIN can be overridden by env. Default is the production apex
+   (flutteraudit.com). If the origin contains a non-root path component, that
+   path is used to rewrite every absolute `/asset/...` reference in the HTML
+   so the site can also work under a subdirectory (e.g. a github.io project
+   page preview). */
+const RAW_ORIGIN = (process.env.SITE_ORIGIN || "https://flutteraudit.com").replace(/\/+$/, "");
 let basePath = "";
 try {
   const u = new URL(RAW_ORIGIN);
@@ -38,7 +38,7 @@ try {
 const SITE = {
   origin: RAW_ORIGIN,
   basePath,
-  title: "Flutter App Audit — Senior Engineer, Fixed Price, 5 Days",
+  title: "Flutter App Audit — Senior Engineer, $500 Flat, 3 Days",
   description: "A senior Flutter engineer who reads codebases the way an auditor reads a balance sheet. 3-day audit for $500 flat. Ranked fix list, frame-by-frame perf report, 60-minute walkthrough.",
   ogImage: "/og.png",
   twitter: "@flutteraudit",
