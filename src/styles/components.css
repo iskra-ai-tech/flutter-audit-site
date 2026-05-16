@@ -313,24 +313,47 @@
   border: 1px solid var(--hairline-strong);
   border-radius: var(--r-2);
   cursor: pointer;
-  transition: all var(--d-quick) var(--ease-out-quart);
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    transform   320ms cubic-bezier(0.34, 1.42, 0.5, 1),
+    border-color 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    background   280ms cubic-bezier(0.4, 0, 0.2, 1),
+    color        280ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow   320ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.form-submit::after {
+/* Soft accent wash that travels left-to-right under the label on hover.
+   Sits behind the text via z-index: -1 inside the isolated stacking
+   context, so it tints without obscuring. No bottom underline. */
+.form-submit::before {
   content: "";
   position: absolute;
-  left: 1.5rem; right: 1.5rem; bottom: -2px;
-  height: 1px;
-  background: var(--accent);
-  transform-origin: left;
-  transform: scaleX(0.18);
-  transition: transform var(--d-fg) var(--ease-emphasized);
+  inset: 0;
+  background: linear-gradient(105deg,
+    transparent 0%,
+    color-mix(in oklab, var(--accent) 22%, transparent) 50%,
+    transparent 100%);
+  transform: translateX(-110%);
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: -1;
 }
-.form-submit:hover::after, .form-submit:focus-visible::after { transform: scaleX(1); }
-.form-submit:hover { border-color: var(--ink-muted); background: oklch(0.205 0.006 250); }
-.form-submit:disabled { opacity: 0.55; cursor: progress; }
-.form-submit:disabled::after { transform: scaleX(0); }
+.form-submit:hover, .form-submit:focus-visible {
+  border-color: color-mix(in oklab, var(--hairline-strong) 30%, var(--accent));
+  background: color-mix(in oklab, var(--bg-elevated) 84%, var(--accent) 6%);
+  color: color-mix(in oklab, var(--ink-strong) 78%, var(--accent));
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 oklch(0.74 0.09 85 / 0.05),
+    0 14px 30px -16px oklch(0.74 0.09 85 / 0.22);
+}
+.form-submit:hover::before,
+.form-submit:focus-visible::before { transform: translateX(110%); }
+.form-submit:hover .cta-arrow,
+.form-submit:focus-visible .cta-arrow { transform: translateX(3px); }
+.form-submit:disabled { opacity: 0.55; cursor: progress; transform: none; }
+.form-submit:disabled::before { transform: translateX(-110%); }
 
 .form-microcopy {
   color: var(--ink-faint);
