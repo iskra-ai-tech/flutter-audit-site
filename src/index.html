@@ -146,7 +146,7 @@
       "@id": "{{site.origin}}/#faq",
       "mainEntity": [
         { "@type": "Question", "name": "Why an audit instead of hiring a senior Flutter engineer?", "acceptedAnswer": { "@type": "Answer", "text": "Hiring takes three to four months and a salary. The audit takes three days and $500. The audit answers the harder question hiring does not — which senior, with which depth, against which file. If you still need to hire afterwards, the audit becomes the job description." } },
-        { "@type": "Question", "name": "Do you need the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The audit is me reading your code. Walkthroughs, screen-shares, and recordings are not substitutes — the diagnosis lives in the repo. NDA before code changes hands." } },
+        { "@type": "Question", "name": "Do you need the source code?", "acceptedAnswer": { "@type": "Answer", "text": "Eventually, yes — the audit is me reading your code. You do not need to share anything to book or get a fit assessment. Once we agree to go ahead, code access is sorted under NDA. If sharing source ultimately is not possible, I will say so straight rather than push." } },
         { "@type": "Question", "name": "Why $500 — is this a real audit at that price?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. You are paying for diagnostic compression: three days of a senior engineer reading the codebase end to end, plus a ranked fix list bound to file and line, a real-device frame timeline, a stakeholder brief, and a walkthrough with your team. Senior contractor day rates run $1,200–$2,400. The audit prices under day-rate × 3 because the deliverable is bounded — diagnosis, not implementation." } },
         { "@type": "Question", "name": "Our app is not slow — it is just messy. Is the audit still useful?", "acceptedAnswer": { "@type": "Answer", "text": "Often more so. Performance audits get the headlines; architectural audits change quarters. If your team is touching eight files for a one-field change, you have a coupling problem — same audit, different probe set: churn × complexity hotspots, dependency staleness, mutation score on the domain core, ghost-code archaeology, half-finished migrations." } },
         { "@type": "Question", "name": "How is this different from automated code-quality tools?", "acceptedAnswer": { "@type": "Answer", "text": "Automated tools tell you what is syntactically wrong or statistically unusual. The audit tells you what is structurally wrong — which decision, which screen, which dependency, on which device. Tools see code. The audit sees decisions, and the cost of leaving them in place." } },
@@ -213,7 +213,7 @@
 
     <div class="hero-ctas">
       <a class="cta" href="#book">
-        Send me your repo
+        Book the audit
         <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
       </a>
       <a class="cta-secondary" href="#checklist">See the 10 fronts I open below</a>
@@ -559,8 +559,8 @@
       <div class="process-step" data-reveal data-reveal-group="process">
         <div class="process-day">DAY 0</div>
         <div>
-          <h3>You send the repo.</h3>
-          <p>GitHub, GitLab, Bitbucket, or a zip. One symptom in your own words. NDA before code changes hands. I reply within 24 hours either confirming we are a fit or telling you exactly why we are not.</p>
+          <h3>You get in touch.</h3>
+          <p>Tell me about your app and one symptom in your own words. A project link is optional &mdash; a description is fine. I reply within 24 hours either confirming we are a fit or telling you exactly why we are not. If we move forward, code access is sorted next, under NDA.</p>
         </div>
       </div>
       <div class="process-step" data-reveal data-reveal-group="process">
@@ -595,7 +595,7 @@
   <div class="page">
     <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">05</span>&nbsp;Price</p>
-      <h2 id="price-h"><span class="lw">One price. Quoted after I see the repo.</span></h2>
+      <h2 id="price-h"><span class="lw">One price. Confirmed after a short fit assessment.</span></h2>
     </header>
 
     <div class="pricing" data-reveal>
@@ -642,7 +642,7 @@
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Do you need the source code?</summary>
-        <div><p>Yes. The audit is me reading your code. Walkthroughs, screen-shares, and recordings are not substitutes — the diagnosis lives in the repo. NDA before code changes hands. If the source cannot be shared, this is not the engagement to book.</p></div>
+        <div><p>Eventually, yes &mdash; the audit is me reading your code. You do not need to share anything to book or to get a fit assessment. Once we agree to go ahead, code access is sorted under NDA. If sharing source ultimately is not possible, I will say so straight rather than push.</p></div>
       </details>
       <details class="faq-item" data-reveal data-reveal-group="faq">
         <summary>Why $500 — is this a real audit at that price?</summary>
@@ -679,7 +679,7 @@
   <div class="page">
     <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">07</span>&nbsp;The engineer</p>
-      <h2 id="about-h"><span class="lw">The person opening your repo.</span></h2>
+      <h2 id="about-h"><span class="lw">The person doing the audit.</span></h2>
     </header>
 
     <div class="about">
@@ -711,8 +711,8 @@
   <div class="page">
     <header class="section-head" data-reveal>
       <p class="eyebrow"><span class="num">08</span>&nbsp;Book</p>
-      <h2 id="book-h"><span class="lw">Send me your repo.</span></h2>
-      <p class="lede muted">Or describe the one symptom. I read every form personally and reply within 24 hours with a fit assessment and a scoped quote.</p>
+      <h2 id="book-h"><span class="lw">Tell me about your app.</span></h2>
+      <p class="lede muted">Describe the one symptom in your own words. I read every form personally and reply within 24 hours with a fit assessment and a scoped quote.</p>
     </header>
 
     <form class="form" data-intake method="POST" action="https://formspree.io/f/xrejnrkl" novalidate>
@@ -730,9 +730,9 @@
       </div>
 
       <div class="form-row" data-reveal data-reveal-group="form">
-        <label for="f-repo">Repo or app</label>
-        <input id="f-repo" name="repo" type="text" placeholder="github.com/yourcompany/your-app or a one-line description" maxlength="200">
-        <p class="hint">Public URL, private repo invite, or the platform stores you ship to. Access is handled after the first reply.</p>
+        <label for="f-repo">Project link <span class="muted">(optional)</span></label>
+        <input id="f-repo" name="repo" type="text" placeholder="App Store link, website, or anything that helps me see your app" maxlength="200">
+        <p class="hint">Optional. A website, store listing, or short description is plenty. Code access is sorted later if we're a fit, under NDA.</p>
       </div>
 
       <div class="form-row" data-reveal data-reveal-group="form">
@@ -793,7 +793,7 @@
 <!-- Sticky mobile-only bottom CTA — hidden when the form section is in view -->
 <div class="sticky-cta" data-sticky-cta aria-hidden="false">
   <a class="cta" href="#book">
-    Send me your repo
+    Book the audit
     <svg class="cta-arrow" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg>
   </a>
 </div>
